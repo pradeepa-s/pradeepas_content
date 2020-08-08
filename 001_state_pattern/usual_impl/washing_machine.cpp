@@ -9,8 +9,10 @@ WashingMachine::WashingMachine(LaundrySensor& laundrySensor, Indicator& indicato
 
 void WashingMachine::Run()
 {
-    if(m_laundrySensor.IsAvailable())
+    m_indicator.SetLaundryLevel(m_laundrySensor.GetLevel());
+
+    if (m_laundrySensor.GetLevel() != LaundrySensor::LaundryLevel::NONE)
     {
-        m_indicator.Set(true);
+        m_indicator.SetWaterLevel(Indicator::WaterLevel::L1);
     }
 }

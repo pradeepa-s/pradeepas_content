@@ -1,11 +1,16 @@
 #include "laundry_sensor.hpp"
 
-void LaundrySensor::AddLaundry()
+void LaundrySensor::AddLaundry(LaundrySensor::LaundryLevel laundryLevel)
 {
-    m_isLaundyAvailable = true;
+    m_laundryLevel = laundryLevel;
 }
 
-bool LaundrySensor::IsAvailable() const
+bool LaundrySensor::IsEmpty() const
 {
-    return m_isLaundyAvailable;
+    return m_laundryLevel != LaundrySensor::LaundryLevel::NONE;
+}
+
+LaundrySensor::LaundryLevel LaundrySensor::GetLevel() const
+{
+    return m_laundryLevel;
 }

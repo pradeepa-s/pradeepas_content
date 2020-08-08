@@ -6,12 +6,20 @@ class LaundrySensor
 public:
     LaundrySensor() = default;
 
-    bool IsAvailable() const;
+    enum class LaundryLevel
+    {
+        NONE,
+        L1,
+        L2
+    };
 
-    void AddLaundry();
+    bool IsEmpty() const;
+    LaundryLevel GetLevel() const;
+
+    void AddLaundry(LaundryLevel laundryLevel);
 
 private:
-    bool m_isLaundyAvailable{false};
+    LaundryLevel m_laundryLevel{LaundryLevel::NONE};
 };
 
 #endif  // _LAUNDRY_SENSOR_HPP

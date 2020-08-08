@@ -21,12 +21,36 @@ protected:
 TEST_F(TestWashingMachineStates, ShallIdentifyNoCloths)
 {
     m_iut.Run();
-    EXPECT_FALSE(m_indicator.GetClothIndicator());
+    EXPECT_FALSE(m_indicator.IsLaundryAvailableIndicatorOn());
 }
 
 TEST_F(TestWashingMachineStates, ShallIdentifyCloths)
 {
-    m_laundrySensor.AddLaundry();
+    m_laundrySensor.AddLaundry(LaundrySensor::LaundryLevel::L1);
     m_iut.Run();
-    EXPECT_TRUE(m_indicator.GetClothIndicator());
+    EXPECT_TRUE(m_indicator.IsLaundryAvailableIndicatorOn());
+}
+
+TEST_F(TestWashingMachineStates, ShallIndicateLaundryWeight)
+{
+    m_laundrySensor.AddLaundry(LaundrySensor::LaundryLevel::L1);
+    m_iut.Run();
+    EXPECT_EQ(LaundrySensor::LaundryLevel::L1, m_indicator.GetLaundryWeightLevel());
+
+    m_laundrySensor.AddLaundry(LaundrySensor::LaundryLevel::L2);
+    m_iut.Run();
+    EXPECT_EQ(LaundrySensor::LaundryLevel::L2, m_indicator.GetLaundryWeightLevel());
+}
+
+TEST_F(TestWashingMachineStates, ShallIndicateRecommendedWaterNone)
+{
+    m_iut.Run();
+    EXPECT_EQ(Indicator::WaterLevel::NONE, m_indicator.GetRecommendedWaterLevel());
+}
+
+TEST_F(TestWashingMachineStates, ShallIndicateRecommendedWaterLevel1)
+{
+    m_laundrySensor.AddLaundry(LaundrySensor::LaundryLevel::L1);
+    m_iut.Run();
+    EXPECT_EQ(Indicator::WaterLevel::L1, m_indicator.GetRecommendedWaterLevel());
 }
