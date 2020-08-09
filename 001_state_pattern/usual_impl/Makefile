@@ -14,7 +14,7 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-GTEST_DIR = /cygdrive/e/gtest/googletest/googletest
+GTEST_DIR = /cygdrive/i/my_projects/googletest/googletest
 
 # Points to the location of the Google Test libraries
 GTEST_LIB_DIR = .
@@ -37,7 +37,8 @@ GTEST_LIBS = libgtest.a libgtest_main.a
 # created to the list.
 TESTS = test_washing_machine
 
-OBJ_FILES = laundry_sensor.o indicator.o washing_machine.o test_washing_machine.o
+OBJ_FILES = laundry_sensor.o indicator.o washing_machine.o user_inputs.o \
+			washing_cycles.o test_washing_machine.o
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -85,9 +86,9 @@ libgtest_main.a : gtest-all.o gtest_main.o
 # indicator.o : $(USER_DIR)/indicator.cpp $(USER_DIR)/indicator.hpp $(GTEST_HEADERS)
 # 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/washing_machine.cpp
 
-test_washing_machine.o : $(USER_DIR)/test_washing_machine.cpp \
-                     $(USER_DIR)/washing_machine.hpp $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/test_washing_machine.cpp
+# test_washing_machine.o : $(USER_DIR)/test_washing_machine.cpp \
+#                      $(USER_DIR)/washing_machine.hpp $(GTEST_HEADERS)
+# 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/test_washing_machine.cpp
 
 test_washing_machine : $(OBJ_FILES) $(GTEST_LIBS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -L$(GTEST_LIB_DIR) -lgtest_main -lpthread $^ -o $@
