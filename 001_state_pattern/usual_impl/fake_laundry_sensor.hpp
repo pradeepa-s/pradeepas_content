@@ -1,17 +1,12 @@
 #ifndef _LAUNDRY_SENSOR_HPP
 #define _LAUNDRY_SENSOR_HPP
 
-class LaundrySensor
+#include "Ilaundry_sensor.hpp"
+
+class FakeLaundrySensor: public ILaundrySensor
 {
 public:
-    LaundrySensor() = default;
-
-    enum class LaundryLevel
-    {
-        NONE,
-        L1,
-        L2
-    };
+    FakeLaundrySensor() = default;
 
     bool IsEmpty() const;
     LaundryLevel GetLevel() const;

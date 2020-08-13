@@ -37,8 +37,8 @@ GTEST_LIBS = libgtest.a libgtest_main.a
 # created to the list.
 TESTS = test_washing_machine
 
-OBJ_FILES = laundry_sensor.o indicator.o washing_machine.o user_inputs.o \
-			washing_cycles.o test_washing_machine.o
+OBJ_FILES = fake_laundry_sensor.o fake_indicator.o washing_machine.o fake_user_inputs.o \
+			fake_washing_cycles.o test_washing_machine.o
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.

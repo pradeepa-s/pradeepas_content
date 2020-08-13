@@ -1,13 +1,15 @@
 #ifndef _USER_INPUTS_HPP
 #define _USER_INPUTS_HPP
 
-class UserInputs
+#include "Iuser_inputs.hpp"
+
+class FakeUserInputs: public IUserInputs
 {
 public:
-    UserInputs() = default;
+    FakeUserInputs() = default;
 
-    bool HasStartButtonPressed() const;
-    
+    bool HasStartButtonPressed() const override;
+
     void PressStart();
 
 private:
