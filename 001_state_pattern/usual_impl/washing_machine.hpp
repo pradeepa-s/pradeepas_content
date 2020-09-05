@@ -20,6 +20,10 @@ public:
 private:
     IIndicator::LaundryLevel Convert(ILaundrySensor::LaundryLevel level);
     IIndicator::WaterLevel Convert(IWaterSensor::WaterLevel level);
+    IWaterSensor::WaterLevel GetRecommendedWaterLevel(ILaundrySensor::LaundryLevel level);
+
+    bool m_started {false};
+    bool m_washStarted {false};
 
     ILaundrySensor& m_laundrySensor;
     IIndicator& m_indicator;

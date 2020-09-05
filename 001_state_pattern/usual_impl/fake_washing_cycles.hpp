@@ -10,6 +10,8 @@ public:
     FakeWashingCycles() = default;
 
     void StartWater() override;
+    void StopWater() override;
+    void StartWashAlgorithm() override;
 
     std::string GetSequence() const;
 

@@ -16,16 +16,26 @@ WashingMachine::WashingMachine(
 void WashingMachine::Run()
 {
     m_indicator.SetLaundryLevel(Convert(m_laundrySensor.GetLevel()));
+    IWaterSensor::WaterLevel recommendedWaterLevel = GetRecommendedWaterLevel(
+            m_laundrySensor.GetLevel());
 
-    if (m_laundrySensor.GetLevel() != ILaundrySensor::LaundryLevel::NONE)
-    {
-        m_indicator.SetWaterLevel(IIndicator::WaterLevel::L1);
-    }
+    m_indicator.SetWaterLevel(Convert(recommendedWaterLevel));
 
-    if (m_userInputs.HasStartButtonPressed())
+    if (!m_started && m_userInputs.HasStartButtonPressed())
     {
         m_washCycles.StartWater();
+        m_started = true;
+    }
+    else
+    {
         m_indicator.SetActualWaterLevel(Convert(m_waterSensor.GetLevel()));
+
+        if (!m_washStarted && m_waterSensor.GetLevel() == recommendedWaterLevel)
+        {
+            m_washCycles.StopWater();
+            m_washCycles.StartWashAlgorithm();
+            m_washStarted = true;
+        }
     }
 }
 
@@ -52,7 +62,24 @@ IIndicator::WaterLevel WashingMachine::Convert(IWaterSensor::WaterLevel level)
             return IIndicator::WaterLevel::NONE;
         case IWaterSensor::WaterLevel::L1:
             return IIndicator::WaterLevel::L1;
+        case IWaterSensor::WaterLevel::L2:
+            return IIndicator::WaterLevel::L2;
     }
 
     return IIndicator::WaterLevel::NONE;
+}
+
+IWaterSensor::WaterLevel WashingMachine::GetRecommendedWaterLevel(ILaundrySensor::LaundryLevel level)
+{
+    switch (level)
+    {
+        case ILaundrySensor::LaundryLevel::NONE:
+            return IWaterSensor::WaterLevel::NONE;
+        case ILaundrySensor::LaundryLevel::L1:
+            return IWaterSensor::WaterLevel::L1;
+        case ILaundrySensor::LaundryLevel::L2:
+            return IWaterSensor::WaterLevel::L2;
+    }
+
+    return IWaterSensor::WaterLevel::NONE;
 }

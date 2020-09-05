@@ -7,7 +7,8 @@ public:
     enum class WaterLevel
     {
         NONE,
-        L1
+        L1,
+        L2
     };
 
     virtual void SetLevel(const WaterLevel level) = 0;
