@@ -8,8 +8,8 @@ class FakeLaundrySensor: public ILaundrySensor
 public:
     FakeLaundrySensor() = default;
 
-    bool IsEmpty() const;
-    LaundryLevel GetLevel() const;
+    bool IsEmpty() const override;
+    LaundryLevel GetLevel() const override;
 
     void AddLaundry(LaundryLevel laundryLevel);
 

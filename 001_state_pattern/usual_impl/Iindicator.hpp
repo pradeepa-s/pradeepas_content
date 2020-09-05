@@ -22,6 +22,7 @@ public:
 
     virtual void SetLaundryLevel(LaundryLevel laundryLevel) = 0;
     virtual void SetWaterLevel(WaterLevel laundryLevel) = 0;
+    virtual void SetActualWaterLevel(WaterLevel level) = 0;
 };
 
 #endif  // _IINDICATOR_HPP
