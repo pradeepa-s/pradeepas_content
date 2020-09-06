@@ -34,6 +34,16 @@ void FakeWashingCycles::StopSpinAlgorithm()
     m_sequence += "<SpinStopped>";
 }
 
+void FakeWashingCycles::ReportError(IWashingCycles::Error error)
+{
+    m_error = error;
+}
+
+bool FakeWashingCycles::IsInError() const
+{
+    return m_error != IWashingCycles::Error::NONE;
+}
+
 bool FakeWashingCycles::IsAlgorithmDone() const
 {
     return !(m_washStarted || m_rinseStarted || m_spinStarted);

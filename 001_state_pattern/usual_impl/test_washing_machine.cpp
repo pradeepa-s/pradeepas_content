@@ -102,6 +102,17 @@ TEST_F(TestWashingMachineStates, ShallIndicateCurrentWaterLevelAfterStartIsPress
     EXPECT_EQ(IIndicator::WaterLevel::L2, m_indicator.GetActualWaterLevel());
 }
 
+TEST_F(TestWashingMachineStates, ShallIndicateWaterError)
+{
+    m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L1);
+    m_userInputs.PressStart();
+    RunEnough();
+
+    m_washCycle.ReportError(IWashingCycles::Error::NO_WATER_FLUX);
+    RunEnough();
+    EXPECT_EQ(IIndicator::MachineState::ERROR, m_indicator.GetState());
+}
+
 TEST_F(TestWashingMachineStates, ShallStartWashingCycleOnceTheWaterLevelReachedTheRecommendedLevel)
 {
     m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);

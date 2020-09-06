@@ -16,17 +16,20 @@ public:
     void StartSpinAlgorithm() override;
     void StopSpinAlgorithm() override;
     bool IsAlgorithmDone() const override;
+    bool IsInError() const override;
 
     std::string GetSequence() const;
     void FinishWash();
     void FinishRinse();
     void FinishSpin();
+    void ReportError(Error error);
 
 private:
     std::string m_sequence{""};
     bool m_washStarted {false};
     bool m_rinseStarted {false};
     bool m_spinStarted {false};
+    Error m_error {Error::NONE};
 };
 
 #endif  // _FAKE_WASHING_CYCLES_HPP

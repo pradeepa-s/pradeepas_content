@@ -25,7 +25,8 @@ public:
         WASHING,
         RINSE,
         SPIN,
-        DONE
+        DONE,
+        ERROR
     };
 
     virtual void SetLaundryLevel(LaundryLevel laundryLevel) = 0;

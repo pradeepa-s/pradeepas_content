@@ -17,6 +17,11 @@ void WashingMachine::Run()
 {
     m_indicator.SetActualWaterLevel(Convert(m_waterSensor.GetLevel()));
 
+    if (m_washCycles.IsInError())
+    {
+        m_state = WashingMachineState::ERROR;
+    }
+
     switch (m_state)
     {
         case WashingMachineState::IDLE:
@@ -82,6 +87,12 @@ void WashingMachine::Run()
                 m_indicator.SetRecommendedWaterLevel(IIndicator::WaterLevel::NONE);
                 m_state = WashingMachineState::IDLE;
             }
+            break;
+
+        case WashingMachineState::ERROR:
+            m_indicator.SetState(IIndicator::MachineState::ERROR);
+            break;
+
         default:
             break;
     }

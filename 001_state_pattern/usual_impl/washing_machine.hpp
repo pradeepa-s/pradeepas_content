@@ -19,7 +19,8 @@ public:
         WASH,
         RINSE,
         SPIN,
-        DONE
+        DONE,
+        ERROR
     };
 
 public:
