@@ -163,3 +163,26 @@ TEST_F(TestWashingMachineStates, ShallIndicateDoneAfterSpin)
             m_washCycle.GetSequence().c_str());
     EXPECT_EQ(IIndicator::MachineState::DONE, m_indicator.GetState());
 }
+
+TEST_F(TestWashingMachineStates, ShallIndicateNoLaundryAfterLaundryIsTakenFromMachine)
+{
+    m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
+    m_userInputs.PressStart();
+    m_waterSensor.SetLevel(IWaterSensor::WaterLevel::L2);
+    RunEnough();
+    m_washCycle.FinishWash();
+    RunEnough();
+    m_washCycle.FinishRinse();
+    RunEnough();
+    m_washCycle.FinishSpin();
+    RunEnough();
+
+    m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::NONE);
+    m_waterSensor.SetLevel(IWaterSensor::WaterLevel::NONE);
+    RunEnough();
+    EXPECT_FALSE(m_indicator.IsLaundryAvailableIndicatorOn());
+    EXPECT_EQ(IIndicator::LaundryLevel::NONE, m_indicator.GetLaundryWeightLevel());
+    EXPECT_EQ(IIndicator::WaterLevel::NONE, m_indicator.GetRecommendedWaterLevel());
+    EXPECT_EQ(IIndicator::WaterLevel::NONE, m_indicator.GetActualWaterLevel());
+    EXPECT_FALSE(m_indicator.IsLaundryAvailableIndicatorOn());
+}

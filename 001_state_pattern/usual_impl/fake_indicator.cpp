@@ -5,7 +5,7 @@ void FakeIndicator::SetLaundryLevel(LaundryLevel laundryLevel)
     m_laundryLevel = laundryLevel;
 }
 
-void FakeIndicator::SetWaterLevel(WaterLevel waterLevel)
+void FakeIndicator::SetRecommendedWaterLevel(WaterLevel waterLevel)
 {
     m_recommendedWaterLevel = waterLevel;
 }

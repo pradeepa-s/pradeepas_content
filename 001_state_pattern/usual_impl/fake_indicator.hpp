@@ -9,7 +9,7 @@ public:
     FakeIndicator() = default;
 
     void SetLaundryLevel(LaundryLevel laundryLevel) override;
-    void SetWaterLevel(WaterLevel laundryLevel) override;
+    void SetRecommendedWaterLevel(WaterLevel laundryLevel) override;
     void SetActualWaterLevel(WaterLevel level) override;
     void SetState(MachineState state) override;
     MachineState GetState() const override;

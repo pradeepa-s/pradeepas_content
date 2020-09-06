@@ -29,7 +29,7 @@ void WashingMachine::Run()
         case WashingMachineState::STANDBY:
             m_indicator.SetLaundryLevel(Convert(m_laundrySensor.GetLevel()));
             m_recommendedWaterLevel = GetRecommendedWaterLevel(m_laundrySensor.GetLevel());
-            m_indicator.SetWaterLevel(Convert(m_recommendedWaterLevel));
+            m_indicator.SetRecommendedWaterLevel(Convert(m_recommendedWaterLevel));
 
             if (m_userInputs.HasStartButtonPressed())
             {
@@ -76,6 +76,12 @@ void WashingMachine::Run()
             break;
 
         case WashingMachineState::DONE:
+            if (m_laundrySensor.GetLevel() == ILaundrySensor::LaundryLevel::NONE)
+            {
+                m_indicator.SetLaundryLevel(Convert(m_laundrySensor.GetLevel()));
+                m_indicator.SetRecommendedWaterLevel(IIndicator::WaterLevel::NONE);
+                m_state = WashingMachineState::IDLE;
+            }
         default:
             break;
     }
