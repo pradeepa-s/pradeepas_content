@@ -23,7 +23,9 @@ public:
     enum class MachineState
     {
         WASHING,
-        RINSE
+        RINSE,
+        SPIN,
+        DONE
     };
 
     virtual void SetLaundryLevel(LaundryLevel laundryLevel) = 0;

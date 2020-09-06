@@ -17,7 +17,9 @@ public:
         STANDBY,
         ADD_WATER,
         WASH,
-        RINSE
+        RINSE,
+        SPIN,
+        DONE
     };
 
 public:

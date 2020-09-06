@@ -58,8 +58,24 @@ void WashingMachine::Run()
             break;
 
         case WashingMachineState::RINSE:
+            if (m_washCycles.IsAlgorithmDone())
+            {
+                m_washCycles.StartSpinAlgorithm();
+                m_indicator.SetState(IIndicator::MachineState::SPIN);
+                m_state = WashingMachineState::SPIN;
+            }
             break;
 
+        case WashingMachineState::SPIN:
+            if (m_washCycles.IsAlgorithmDone())
+            {
+                m_washCycles.StopSpinAlgorithm();
+                m_indicator.SetState(IIndicator::MachineState::DONE);
+                m_state = WashingMachineState::DONE;
+            }
+            break;
+
+        case WashingMachineState::DONE:
         default:
             break;
     }

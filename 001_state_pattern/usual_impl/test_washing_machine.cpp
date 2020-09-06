@@ -105,12 +105,9 @@ TEST_F(TestWashingMachineStates, ShallIndicateCurrentWaterLevelAfterStartIsPress
 TEST_F(TestWashingMachineStates, ShallStartWashingCycleOnceTheWaterLevelReachedTheRecommendedLevel)
 {
     m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
-    RunEnough();
-
     m_userInputs.PressStart();
-    RunEnough();
-
     m_waterSensor.SetLevel(IWaterSensor::WaterLevel::L2);
+
     RunEnough();
 
     EXPECT_STREQ("<WaterStarted-SlowSpin><WaterStopped><WashAlgoStarted>",
@@ -123,10 +120,46 @@ TEST_F(TestWashingMachineStates, ShallStartRinseAlgorithmAfterWash)
     m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
     m_userInputs.PressStart();
     m_waterSensor.SetLevel(IWaterSensor::WaterLevel::L2);
-    m_washCycle.FinishWash();
+    RunEnough();
 
+    m_washCycle.FinishWash();
     RunEnough();
     EXPECT_STREQ("<WaterStarted-SlowSpin><WaterStopped><WashAlgoStarted><RinseStarted>",
             m_washCycle.GetSequence().c_str());
     EXPECT_EQ(IIndicator::MachineState::RINSE, m_indicator.GetState());
+}
+
+TEST_F(TestWashingMachineStates, ShallStartSpinAlgorithmAfterRinse)
+{
+    m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
+    m_userInputs.PressStart();
+    m_waterSensor.SetLevel(IWaterSensor::WaterLevel::L2);
+    RunEnough();
+    m_washCycle.FinishWash();
+    RunEnough();
+
+    m_washCycle.FinishRinse();
+    RunEnough();
+
+    EXPECT_STREQ("<WaterStarted-SlowSpin><WaterStopped><WashAlgoStarted><RinseStarted><SpinStarted>",
+            m_washCycle.GetSequence().c_str());
+    EXPECT_EQ(IIndicator::MachineState::SPIN, m_indicator.GetState());
+}
+
+TEST_F(TestWashingMachineStates, ShallIndicateDoneAfterSpin)
+{
+    m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
+    m_userInputs.PressStart();
+    m_waterSensor.SetLevel(IWaterSensor::WaterLevel::L2);
+    RunEnough();
+    m_washCycle.FinishWash();
+    RunEnough();
+    m_washCycle.FinishRinse();
+    RunEnough();
+
+    m_washCycle.FinishSpin();
+    RunEnough();
+    EXPECT_STREQ("<WaterStarted-SlowSpin><WaterStopped><WashAlgoStarted><RinseStarted><SpinStarted><SpinStopped>",
+            m_washCycle.GetSequence().c_str());
+    EXPECT_EQ(IIndicator::MachineState::DONE, m_indicator.GetState());
 }
