@@ -15,6 +15,16 @@ void FakeIndicator::SetActualWaterLevel(WaterLevel level)
     m_actualWaterLevel = level;
 }
 
+void FakeIndicator::SetState(MachineState state)
+{
+    m_washingState = state;
+}
+
+IIndicator::MachineState FakeIndicator::GetState() const
+{
+    return m_washingState;
+}
+
 IIndicator::LaundryLevel FakeIndicator::GetLaundryWeightLevel() const
 {
     return m_laundryLevel;

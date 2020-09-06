@@ -15,27 +15,53 @@ WashingMachine::WashingMachine(
 
 void WashingMachine::Run()
 {
-    m_indicator.SetLaundryLevel(Convert(m_laundrySensor.GetLevel()));
-    IWaterSensor::WaterLevel recommendedWaterLevel = GetRecommendedWaterLevel(
-            m_laundrySensor.GetLevel());
+    m_indicator.SetActualWaterLevel(Convert(m_waterSensor.GetLevel()));
 
-    m_indicator.SetWaterLevel(Convert(recommendedWaterLevel));
-
-    if (!m_started && m_userInputs.HasStartButtonPressed())
+    switch (m_state)
     {
-        m_washCycles.StartWater();
-        m_started = true;
-    }
-    else
-    {
-        m_indicator.SetActualWaterLevel(Convert(m_waterSensor.GetLevel()));
+        case WashingMachineState::IDLE:
+            if (m_laundrySensor.GetLevel() != ILaundrySensor::LaundryLevel::NONE)
+            {
+                m_state = WashingMachineState::STANDBY;
+            }
+            break;
 
-        if (!m_washStarted && m_waterSensor.GetLevel() == recommendedWaterLevel)
-        {
-            m_washCycles.StopWater();
-            m_washCycles.StartWashAlgorithm();
-            m_washStarted = true;
-        }
+        case WashingMachineState::STANDBY:
+            m_indicator.SetLaundryLevel(Convert(m_laundrySensor.GetLevel()));
+            m_recommendedWaterLevel = GetRecommendedWaterLevel(m_laundrySensor.GetLevel());
+            m_indicator.SetWaterLevel(Convert(m_recommendedWaterLevel));
+
+            if (m_userInputs.HasStartButtonPressed())
+            {
+                m_washCycles.StartWater();
+                m_state = WashingMachineState::ADD_WATER;
+            }
+            break;
+
+        case WashingMachineState::ADD_WATER:
+            if (RecommendedWaterLevelReached())
+            {
+                m_washCycles.StopWater();
+                m_washCycles.StartWashAlgorithm();
+                m_indicator.SetState(IIndicator::MachineState::WASHING);
+                m_state = WashingMachineState::WASH;
+            }
+            break;
+
+        case WashingMachineState::WASH:
+            if (m_washCycles.IsAlgorithmDone())
+            {
+                m_washCycles.StartRinseAlgorithm();
+                m_indicator.SetState(IIndicator::MachineState::RINSE);
+                m_state = WashingMachineState::RINSE;
+            }
+            break;
+
+        case WashingMachineState::RINSE:
+            break;
+
+        default:
+            break;
     }
 }
 
@@ -82,4 +108,9 @@ IWaterSensor::WaterLevel WashingMachine::GetRecommendedWaterLevel(ILaundrySensor
     }
 
     return IWaterSensor::WaterLevel::NONE;
+}
+
+bool WashingMachine::RecommendedWaterLevelReached()
+{
+    return m_recommendedWaterLevel == m_waterSensor.GetLevel();
 }

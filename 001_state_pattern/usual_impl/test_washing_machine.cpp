@@ -102,7 +102,6 @@ TEST_F(TestWashingMachineStates, ShallIndicateCurrentWaterLevelAfterStartIsPress
     EXPECT_EQ(IIndicator::WaterLevel::L2, m_indicator.GetActualWaterLevel());
 }
 
-
 TEST_F(TestWashingMachineStates, ShallStartWashingCycleOnceTheWaterLevelReachedTheRecommendedLevel)
 {
     m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
@@ -116,4 +115,18 @@ TEST_F(TestWashingMachineStates, ShallStartWashingCycleOnceTheWaterLevelReachedT
 
     EXPECT_STREQ("<WaterStarted-SlowSpin><WaterStopped><WashAlgoStarted>",
             m_washCycle.GetSequence().c_str());
+    EXPECT_EQ(IIndicator::MachineState::WASHING, m_indicator.GetState());
+}
+
+TEST_F(TestWashingMachineStates, ShallStartRinseAlgorithmAfterWash)
+{
+    m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
+    m_userInputs.PressStart();
+    m_waterSensor.SetLevel(IWaterSensor::WaterLevel::L2);
+    m_washCycle.FinishWash();
+
+    RunEnough();
+    EXPECT_STREQ("<WaterStarted-SlowSpin><WaterStopped><WashAlgoStarted><RinseStarted>",
+            m_washCycle.GetSequence().c_str());
+    EXPECT_EQ(IIndicator::MachineState::RINSE, m_indicator.GetState());
 }

@@ -12,11 +12,15 @@ public:
     void StartWater() override;
     void StopWater() override;
     void StartWashAlgorithm() override;
+    void StartRinseAlgorithm() override;
+    bool IsAlgorithmDone() const override;
 
     std::string GetSequence() const;
+    void FinishWash();
 
 private:
     std::string m_sequence{""};
+    bool m_washFinished {false};
 };
 
 #endif  // _FAKE_WASHING_CYCLES_HPP

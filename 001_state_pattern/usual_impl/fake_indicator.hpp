@@ -11,6 +11,8 @@ public:
     void SetLaundryLevel(LaundryLevel laundryLevel) override;
     void SetWaterLevel(WaterLevel laundryLevel) override;
     void SetActualWaterLevel(WaterLevel level) override;
+    void SetState(MachineState state) override;
+    MachineState GetState() const override;
 
     bool IsLaundryAvailableIndicatorOn() const;
     LaundryLevel GetLaundryWeightLevel() const;
@@ -21,6 +23,7 @@ private:
     LaundryLevel m_laundryLevel{LaundryLevel::NONE};
     WaterLevel m_recommendedWaterLevel{WaterLevel::NONE};
     WaterLevel m_actualWaterLevel{WaterLevel::NONE};
+    MachineState m_washingState{MachineState::WASHING};
 };
 
 #endif  // _FAKE_INDICATOR_HPP

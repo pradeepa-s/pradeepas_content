@@ -20,9 +20,17 @@ public:
         L2
     };
 
+    enum class MachineState
+    {
+        WASHING,
+        RINSE
+    };
+
     virtual void SetLaundryLevel(LaundryLevel laundryLevel) = 0;
     virtual void SetWaterLevel(WaterLevel laundryLevel) = 0;
     virtual void SetActualWaterLevel(WaterLevel level) = 0;
+    virtual void SetState(MachineState state) = 0;
+    virtual MachineState GetState() const = 0;
 };
 
 #endif  // _IINDICATOR_HPP

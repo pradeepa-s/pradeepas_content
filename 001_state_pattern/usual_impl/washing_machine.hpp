@@ -11,6 +11,16 @@ class IWashingCycles;
 class WashingMachine
 {
 public:
+    enum class WashingMachineState
+    {
+        IDLE,
+        STANDBY,
+        ADD_WATER,
+        WASH,
+        RINSE
+    };
+
+public:
     WashingMachine(
             ILaundrySensor& laundrySensor, IIndicator& indicator, IUserInputs& userInputs,
             IWashingCycles& washingCycles, IWaterSensor& waterSensor);
@@ -22,14 +32,16 @@ private:
     IIndicator::WaterLevel Convert(IWaterSensor::WaterLevel level);
     IWaterSensor::WaterLevel GetRecommendedWaterLevel(ILaundrySensor::LaundryLevel level);
 
-    bool m_started {false};
-    bool m_washStarted {false};
+    WashingMachineState m_state {WashingMachineState::IDLE};
+    IWaterSensor::WaterLevel m_recommendedWaterLevel {IWaterSensor::WaterLevel::L2};
 
     ILaundrySensor& m_laundrySensor;
     IIndicator& m_indicator;
     IUserInputs& m_userInputs;
     IWashingCycles& m_washCycles;
     IWaterSensor& m_waterSensor;
+
+    bool RecommendedWaterLevelReached();
 };
 
 #endif  // _WASHING_MACHINE_HPP
