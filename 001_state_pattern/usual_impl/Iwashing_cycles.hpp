@@ -19,6 +19,7 @@ public:
     virtual void StopSpinAlgorithm() = 0;
     virtual bool IsAlgorithmDone() const = 0;
     virtual bool IsInError() const = 0;
+    virtual void ClearError() = 0;
 };
 
 #endif  // _IWASHING_CYCLES_HPP

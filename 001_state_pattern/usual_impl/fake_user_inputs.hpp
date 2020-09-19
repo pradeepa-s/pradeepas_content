@@ -11,6 +11,7 @@ public:
     bool HasStartButtonPressed() const override;
 
     void PressStart();
+    void Release();
 
 private:
     bool m_isStartActive{false};

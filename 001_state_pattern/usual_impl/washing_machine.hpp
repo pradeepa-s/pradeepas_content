@@ -15,6 +15,7 @@ public:
     {
         IDLE,
         STANDBY,
+        STARTING_WATER,
         ADD_WATER,
         WASH,
         RINSE,
@@ -34,8 +35,10 @@ private:
     IIndicator::LaundryLevel Convert(ILaundrySensor::LaundryLevel level);
     IIndicator::WaterLevel Convert(IWaterSensor::WaterLevel level);
     IWaterSensor::WaterLevel GetRecommendedWaterLevel(ILaundrySensor::LaundryLevel level);
+    WashingMachineState GetPreErrorState(WashingMachineState state);
 
     WashingMachineState m_state {WashingMachineState::IDLE};
+    WashingMachineState m_preErrorState {WashingMachineState::IDLE};
     IWaterSensor::WaterLevel m_recommendedWaterLevel {IWaterSensor::WaterLevel::L2};
 
     ILaundrySensor& m_laundrySensor;

@@ -17,8 +17,9 @@ void WashingMachine::Run()
 {
     m_indicator.SetActualWaterLevel(Convert(m_waterSensor.GetLevel()));
 
-    if (m_washCycles.IsInError())
+    if (m_state != WashingMachineState::ERROR && m_washCycles.IsInError())
     {
+        m_preErrorState = m_state;
         m_state = WashingMachineState::ERROR;
     }
 
@@ -38,9 +39,13 @@ void WashingMachine::Run()
 
             if (m_userInputs.HasStartButtonPressed())
             {
-                m_washCycles.StartWater();
-                m_state = WashingMachineState::ADD_WATER;
+                m_state = WashingMachineState::STARTING_WATER;
             }
+            break;
+
+        case WashingMachineState::STARTING_WATER:
+            m_washCycles.StartWater();
+            m_state = WashingMachineState::ADD_WATER;
             break;
 
         case WashingMachineState::ADD_WATER:
@@ -91,6 +96,11 @@ void WashingMachine::Run()
 
         case WashingMachineState::ERROR:
             m_indicator.SetState(IIndicator::MachineState::ERROR);
+            if (m_userInputs.HasStartButtonPressed())
+            {
+                m_washCycles.ClearError();
+                m_state = GetPreErrorState(m_preErrorState);
+            }
             break;
 
         default:
@@ -146,4 +156,15 @@ IWaterSensor::WaterLevel WashingMachine::GetRecommendedWaterLevel(ILaundrySensor
 bool WashingMachine::RecommendedWaterLevelReached()
 {
     return m_recommendedWaterLevel == m_waterSensor.GetLevel();
+}
+
+WashingMachine::WashingMachineState WashingMachine::GetPreErrorState(WashingMachineState state)
+{
+    switch (state)
+    {
+        case WashingMachineState::ADD_WATER:
+            return WashingMachineState::STARTING_WATER;
+        default:
+            return state;
+    }
 }

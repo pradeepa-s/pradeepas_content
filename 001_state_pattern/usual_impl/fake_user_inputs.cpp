@@ -9,3 +9,8 @@ void FakeUserInputs::PressStart()
 {
     m_isStartActive = true;
 }
+
+void FakeUserInputs::Release()
+{
+    m_isStartActive = false;
+}

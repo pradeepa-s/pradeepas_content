@@ -25,6 +25,20 @@ protected:
         }
     }
 
+    void RunUntilWaterStarts()
+    {
+        m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L1);
+        m_userInputs.PressStart();
+        RunEnough();
+        m_userInputs.Release();
+    }
+
+    void TriggerError(IWashingCycles::Error error)
+    {
+        m_washCycle.ReportError(error);
+        RunEnough();
+    }
+
     FakeLaundrySensor m_laundrySensor;
     FakeIndicator m_indicator;
     FakeUserInputs m_userInputs;
@@ -104,12 +118,8 @@ TEST_F(TestWashingMachineStates, ShallIndicateCurrentWaterLevelAfterStartIsPress
 
 TEST_F(TestWashingMachineStates, ShallIndicateWaterError)
 {
-    m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L1);
-    m_userInputs.PressStart();
-    RunEnough();
-
-    m_washCycle.ReportError(IWashingCycles::Error::NO_WATER_FLUX);
-    RunEnough();
+    RunUntilWaterStarts();
+    TriggerError(IWashingCycles::Error::NO_WATER_FLUX);
     EXPECT_EQ(IIndicator::MachineState::ERROR, m_indicator.GetState());
 }
 
@@ -197,3 +207,43 @@ TEST_F(TestWashingMachineStates, ShallIndicateNoLaundryAfterLaundryIsTakenFromMa
     EXPECT_EQ(IIndicator::WaterLevel::NONE, m_indicator.GetActualWaterLevel());
     EXPECT_FALSE(m_indicator.IsLaundryAvailableIndicatorOn());
 }
+
+TEST_F(TestWashingMachineStates, ShallStartWaterIfUserFixedWaterError)
+{
+    RunUntilWaterStarts();
+    TriggerError(IWashingCycles::Error::NO_WATER_FLUX);
+
+    m_userInputs.PressStart();
+    RunEnough();
+    EXPECT_STREQ("<WaterStarted-SlowSpin><ErrorCleared><WaterStarted-SlowSpin>", m_washCycle.GetSequence().c_str());
+}
+//
+// TEST_F(TestWashingMachineStates, ShallIndicateErrorsDuringWashingLaundry)
+// {
+//     EXPECT_TRUE(false);
+// }
+//
+// TEST_F(TestWashingMachineStates, ShallContinueTheWashIfUserClearedWashingError)
+// {
+//     EXPECT_TRUE(false);
+// }
+//
+// TEST_F(TestWashingMachineStates, ShallIndicateErrorsDuringRinsingLaundry)
+// {
+//     EXPECT_TRUE(false);
+// }
+//
+// TEST_F(TestWashingMachineStates, ShallContinueTheWashIfUserClearedRinsingError)
+// {
+//     EXPECT_TRUE(false);
+// }
+//
+// TEST_F(TestWashingMachineStates, ShallIndicateErrorsDuringSpin)
+// {
+//     EXPECT_TRUE(false);
+// }
+//
+// TEST_F(TestWashingMachineStates, ShallStopTheWashOperationIfUserPressCancelWhenInError)
+// {
+//     EXPECT_TRUE(false);
+// }

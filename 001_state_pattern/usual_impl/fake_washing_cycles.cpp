@@ -39,6 +39,12 @@ void FakeWashingCycles::ReportError(IWashingCycles::Error error)
     m_error = error;
 }
 
+void FakeWashingCycles::ClearError()
+{
+    m_error = IWashingCycles::Error::NONE;
+    m_sequence += "<ErrorCleared>";
+}
+
 bool FakeWashingCycles::IsInError() const
 {
     return m_error != IWashingCycles::Error::NONE;

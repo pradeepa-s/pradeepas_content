@@ -17,6 +17,7 @@ public:
     void StopSpinAlgorithm() override;
     bool IsAlgorithmDone() const override;
     bool IsInError() const override;
+    void ClearError() override;
 
     std::string GetSequence() const;
     void FinishWash();
