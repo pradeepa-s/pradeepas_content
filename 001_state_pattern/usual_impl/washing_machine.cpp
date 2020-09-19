@@ -65,19 +65,27 @@ void WashingMachine::Run()
         case WashingMachineState::WASH:
             if (m_washCycles.IsAlgorithmDone())
             {
-                m_washCycles.StartRinseAlgorithm();
-                m_indicator.SetState(IIndicator::MachineState::RINSE);
-                m_state = WashingMachineState::RINSE;
+                m_state = WashingMachineState::STARTING_RINSE;
             }
+            break;
+
+        case WashingMachineState::STARTING_RINSE:
+            m_washCycles.StartRinseAlgorithm();
+            m_indicator.SetState(IIndicator::MachineState::RINSE);
+            m_state = WashingMachineState::RINSE;
             break;
 
         case WashingMachineState::RINSE:
             if (m_washCycles.IsAlgorithmDone())
             {
-                m_washCycles.StartSpinAlgorithm();
-                m_indicator.SetState(IIndicator::MachineState::SPIN);
-                m_state = WashingMachineState::SPIN;
+                m_state = WashingMachineState::STARTING_SPIN;
             }
+            break;
+
+        case WashingMachineState::STARTING_SPIN:
+            m_washCycles.StartSpinAlgorithm();
+            m_indicator.SetState(IIndicator::MachineState::SPIN);
+            m_state = WashingMachineState::SPIN;
             break;
 
         case WashingMachineState::SPIN:
@@ -170,6 +178,10 @@ WashingMachine::WashingMachineState WashingMachine::GetPreErrorState(WashingMach
             return WashingMachineState::STARTING_WATER;
         case WashingMachineState::WASH:
             return WashingMachineState::STARTING_WASH;
+        case WashingMachineState::RINSE:
+            return WashingMachineState::STARTING_RINSE;
+        case WashingMachineState::SPIN:
+            return WashingMachineState::STARTING_SPIN;
         default:
             return state;
     }

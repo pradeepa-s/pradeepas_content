@@ -19,7 +19,9 @@ public:
         ADD_WATER,
         STARTING_WASH,
         WASH,
+        STARTING_RINSE,
         RINSE,
+        STARTING_SPIN,
         SPIN,
         DONE,
         ERROR

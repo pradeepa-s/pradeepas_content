@@ -9,6 +9,7 @@ public:
     {
         NONE,
         WASH_ERROR,
+        RINSE_ERROR,
         NO_WATER_FLUX
     };
 
