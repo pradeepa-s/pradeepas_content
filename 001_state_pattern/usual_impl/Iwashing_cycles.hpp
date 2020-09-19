@@ -8,6 +8,7 @@ public:
     enum class Error
     {
         NONE,
+        WASH_ERROR,
         NO_WATER_FLUX
     };
 

@@ -52,10 +52,14 @@ void WashingMachine::Run()
             if (RecommendedWaterLevelReached())
             {
                 m_washCycles.StopWater();
-                m_washCycles.StartWashAlgorithm();
-                m_indicator.SetState(IIndicator::MachineState::WASHING);
-                m_state = WashingMachineState::WASH;
+                m_state = WashingMachineState::STARTING_WASH;
             }
+            break;
+
+        case WashingMachineState::STARTING_WASH:
+            m_washCycles.StartWashAlgorithm();
+            m_indicator.SetState(IIndicator::MachineState::WASHING);
+            m_state = WashingMachineState::WASH;
             break;
 
         case WashingMachineState::WASH:
@@ -164,6 +168,8 @@ WashingMachine::WashingMachineState WashingMachine::GetPreErrorState(WashingMach
     {
         case WashingMachineState::ADD_WATER:
             return WashingMachineState::STARTING_WATER;
+        case WashingMachineState::WASH:
+            return WashingMachineState::STARTING_WASH;
         default:
             return state;
     }

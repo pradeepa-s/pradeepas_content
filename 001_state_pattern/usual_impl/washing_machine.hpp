@@ -17,6 +17,7 @@ public:
         STANDBY,
         STARTING_WATER,
         ADD_WATER,
+        STARTING_WASH,
         WASH,
         RINSE,
         SPIN,

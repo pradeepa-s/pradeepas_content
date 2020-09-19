@@ -18,7 +18,7 @@ protected:
 protected:
     void RunEnough()
     {
-        const int ENOUGH_REPS = 10;
+        const int ENOUGH_REPS = 20;
         for (int i = 0; i < ENOUGH_REPS; i++)
         {
             m_iut.Run();
@@ -29,6 +29,15 @@ protected:
     {
         m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L1);
         m_userInputs.PressStart();
+        RunEnough();
+        m_userInputs.Release();
+    }
+
+    void RunUntilWashStarts()
+    {
+        m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
+        m_userInputs.PressStart();
+        m_waterSensor.SetLevel(IWaterSensor::WaterLevel::L2);
         RunEnough();
         m_userInputs.Release();
     }
@@ -125,11 +134,7 @@ TEST_F(TestWashingMachineStates, ShallIndicateWaterError)
 
 TEST_F(TestWashingMachineStates, ShallStartWashingCycleOnceTheWaterLevelReachedTheRecommendedLevel)
 {
-    m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
-    m_userInputs.PressStart();
-    m_waterSensor.SetLevel(IWaterSensor::WaterLevel::L2);
-
-    RunEnough();
+    RunUntilWashStarts();
 
     EXPECT_STREQ("<WaterStarted-SlowSpin><WaterStopped><WashAlgoStarted>",
             m_washCycle.GetSequence().c_str());
@@ -138,10 +143,7 @@ TEST_F(TestWashingMachineStates, ShallStartWashingCycleOnceTheWaterLevelReachedT
 
 TEST_F(TestWashingMachineStates, ShallStartRinseAlgorithmAfterWash)
 {
-    m_laundrySensor.AddLaundry(ILaundrySensor::LaundryLevel::L2);
-    m_userInputs.PressStart();
-    m_waterSensor.SetLevel(IWaterSensor::WaterLevel::L2);
-    RunEnough();
+    RunUntilWashStarts();
 
     m_washCycle.FinishWash();
     RunEnough();
@@ -217,17 +219,27 @@ TEST_F(TestWashingMachineStates, ShallStartWaterIfUserFixedWaterError)
     RunEnough();
     EXPECT_STREQ("<WaterStarted-SlowSpin><ErrorCleared><WaterStarted-SlowSpin>", m_washCycle.GetSequence().c_str());
 }
-//
-// TEST_F(TestWashingMachineStates, ShallIndicateErrorsDuringWashingLaundry)
-// {
-//     EXPECT_TRUE(false);
-// }
-//
-// TEST_F(TestWashingMachineStates, ShallContinueTheWashIfUserClearedWashingError)
-// {
-//     EXPECT_TRUE(false);
-// }
-//
+
+TEST_F(TestWashingMachineStates, ShallIndicateErrorsDuringWashingLaundry)
+{
+    RunUntilWashStarts();
+    TriggerError(IWashingCycles::Error::WASH_ERROR);
+    EXPECT_EQ(IIndicator::MachineState::ERROR, m_indicator.GetState());
+}
+
+TEST_F(TestWashingMachineStates, ShallContinueTheWashIfUserClearedWashingError)
+{
+    RunUntilWashStarts();
+    TriggerError(IWashingCycles::Error::WASH_ERROR);
+
+    m_userInputs.PressStart();
+    RunEnough();
+    EXPECT_STREQ(
+            "<WaterStarted-SlowSpin><WaterStopped><WashAlgoStarted><ErrorCleared><WashAlgoStarted>",
+            m_washCycle.GetSequence().c_str());
+    EXPECT_EQ(IIndicator::MachineState::WASHING, m_indicator.GetState());
+}
+
 // TEST_F(TestWashingMachineStates, ShallIndicateErrorsDuringRinsingLaundry)
 // {
 //     EXPECT_TRUE(false);
