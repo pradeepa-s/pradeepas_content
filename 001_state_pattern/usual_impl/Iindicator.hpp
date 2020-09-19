@@ -22,6 +22,7 @@ public:
 
     enum class MachineState
     {
+        IDLE,
         WASHING,
         RINSE,
         SPIN,

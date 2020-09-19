@@ -9,12 +9,15 @@ public:
     FakeUserInputs() = default;
 
     bool HasStartButtonPressed() const override;
+    bool HasStopButtonPressed() const override;
 
     void PressStart();
+    void PressStop();
     void Release();
 
 private:
-    bool m_isStartActive{false};
+    bool m_isStartActive {false};
+    bool m_isStopActive {false};
 };
 
 #endif  // _USER_INPUTS_HPP

@@ -113,6 +113,12 @@ void WashingMachine::Run()
                 m_washCycles.ClearError();
                 m_state = GetPreErrorState(m_preErrorState);
             }
+            else if (m_userInputs.HasStopButtonPressed())
+            {
+                m_washCycles.Reset();
+                m_state = WashingMachineState::IDLE;
+                m_indicator.SetState(IIndicator::MachineState::IDLE);
+            }
             break;
 
         default:

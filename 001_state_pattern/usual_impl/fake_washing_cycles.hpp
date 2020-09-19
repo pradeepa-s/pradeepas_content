@@ -9,6 +9,7 @@ class FakeWashingCycles: public IWashingCycles
 public:
     FakeWashingCycles() = default;
 
+    void Reset() override;
     void StartWater() override;
     void StopWater() override;
     void StartWashAlgorithm() override;

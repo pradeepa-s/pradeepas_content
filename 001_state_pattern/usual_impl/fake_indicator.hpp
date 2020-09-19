@@ -23,7 +23,7 @@ private:
     LaundryLevel m_laundryLevel{LaundryLevel::NONE};
     WaterLevel m_recommendedWaterLevel{WaterLevel::NONE};
     WaterLevel m_actualWaterLevel{WaterLevel::NONE};
-    MachineState m_washingState{MachineState::WASHING};
+    MachineState m_washingState{MachineState::IDLE};
 };
 
 #endif  // _FAKE_INDICATOR_HPP

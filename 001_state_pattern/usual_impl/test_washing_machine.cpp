@@ -72,10 +72,11 @@ protected:
     WashingMachine m_iut;
 };
 
-TEST_F(TestWashingMachineStates, ShallIdentifyNoCloths)
+TEST_F(TestWashingMachineStates, ShallIdentifyNoClothsAndIdle)
 {
     RunEnough();
     EXPECT_FALSE(m_indicator.IsLaundryAvailableIndicatorOn());
+    EXPECT_EQ(IIndicator::MachineState::IDLE, m_indicator.GetState());
 }
 
 TEST_F(TestWashingMachineStates, ShallIdentifyCloths)
@@ -258,7 +259,7 @@ TEST_F(TestWashingMachineStates, ShallIndicateErrorsDuringRinsingLaundry)
     EXPECT_EQ(IIndicator::MachineState::ERROR, m_indicator.GetState());
 }
 
-TEST_F(TestWashingMachineStates, ShallContinueTheWashIfUserClearedRinsingError)
+TEST_F(TestWashingMachineStates, ShallContinueTheRinseIfUserClearedRinsingError)
 {
     RunUntilRinseStarts();
     TriggerError(IWashingCycles::Error::RINSE_ERROR);
@@ -277,7 +278,7 @@ TEST_F(TestWashingMachineStates, ShallIndicateErrorsDuringSpin)
     EXPECT_EQ(IIndicator::MachineState::ERROR, m_indicator.GetState());
 }
 
-TEST_F(TestWashingMachineStates, ShallStopTheWashOperationIfUserPressCancelWhenInError)
+TEST_F(TestWashingMachineStates, ShallContinueTheSpinIfUserClearedSpinError)
 {
     RunUntilSpinStarts();
     TriggerError(IWashingCycles::Error::RINSE_ERROR);
@@ -288,4 +289,15 @@ TEST_F(TestWashingMachineStates, ShallStopTheWashOperationIfUserPressCancelWhenI
             "<WaterStarted-SlowSpin><WaterStopped><WashAlgoStarted><RinseStarted><SpinStarted><ErrorCleared><SpinStarted>",
             m_washCycle.GetSequence().c_str());
     EXPECT_EQ(IIndicator::MachineState::SPIN, m_indicator.GetState());
+}
+
+TEST_F(TestWashingMachineStates, ShallStopTheWashOperationIfUserPressCancelWhenInError)
+{
+    RunUntilSpinStarts();
+    TriggerError(IWashingCycles::Error::RINSE_ERROR);
+
+    m_userInputs.PressStop();
+    RunEnough();
+    EXPECT_EQ(IIndicator::MachineState::IDLE, m_indicator.GetState());
+    EXPECT_STREQ("", m_washCycle.GetSequence().c_str());
 }

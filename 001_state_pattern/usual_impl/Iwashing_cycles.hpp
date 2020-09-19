@@ -13,6 +13,7 @@ public:
         NO_WATER_FLUX
     };
 
+    virtual void Reset() = 0;
     virtual void StartWater() = 0;
     virtual void StopWater() = 0;
     virtual void StartWashAlgorithm() = 0;

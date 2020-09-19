@@ -1,6 +1,15 @@
 #include "fake_washing_cycles.hpp"
 #include <iostream>
 
+void FakeWashingCycles::Reset()
+{
+    m_sequence = "";
+    m_washStarted = false;
+    m_rinseStarted = false;
+    m_spinStarted = false;
+    m_error = Error::NONE;
+}
+
 void FakeWashingCycles::StartWater()
 {
     m_sequence += "<WaterStarted-SlowSpin>";
