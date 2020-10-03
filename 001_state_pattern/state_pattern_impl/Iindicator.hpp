@@ -35,6 +35,8 @@ public:
     virtual void SetActualWaterLevel(WaterLevel level) = 0;
     virtual void SetState(MachineState state) = 0;
     virtual MachineState GetState() const = 0;
+
+    virtual ~IIndicator() {}
 };
 
 #endif  // _IINDICATOR_HPP

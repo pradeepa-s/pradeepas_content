@@ -6,6 +6,8 @@ class IUserInputs
 public:
     virtual bool HasStartButtonPressed() const = 0;
     virtual bool HasStopButtonPressed() const = 0;
+
+    virtual ~IUserInputs() {}
 };
 
 #endif  // _IUSER_INPUTS_HPP
