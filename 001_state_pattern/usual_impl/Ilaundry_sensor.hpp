@@ -13,6 +13,8 @@ public:
 
     virtual bool IsEmpty() const = 0;
     virtual LaundryLevel GetLevel() const = 0;
+
+    virtual ~ILaundrySensor() {}
 };
 
 #endif  // _ILAUNDRY_SENSOR_HPP

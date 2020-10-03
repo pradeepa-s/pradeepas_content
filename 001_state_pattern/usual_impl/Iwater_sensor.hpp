@@ -13,6 +13,8 @@ public:
 
     virtual void SetLevel(const WaterLevel level) = 0;
     virtual WaterLevel GetLevel() const = 0;
+
+    virtual ~IWaterSensor() {}
 };
 
 #endif  // _IWATER_SENSOR_HPP
