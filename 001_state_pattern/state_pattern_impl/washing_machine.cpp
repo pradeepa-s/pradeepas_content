@@ -9,6 +9,7 @@
 #include "standby_state.hpp"
 #include "add_water_state.hpp"
 #include "wash_state.hpp"
+#include "rinse_state.hpp"
 
 using namespace std;
 
@@ -22,6 +23,7 @@ WashingMachine::WashingMachine(
     auto standbyState = make_shared<StandbyState>(*this, m_laundrySensor, m_indicator, m_userInputs);
     auto addWaterState = make_shared<AddWaterState>(*this, m_waterSensor, m_washCycles);
     auto washState = make_shared<WashState>(*this, m_indicator, m_washCycles);
+    auto rinseState = make_shared<RinseState>(*this, m_indicator, m_washCycles);
     m_states.insert(
             make_pair(
                 IWashingMachineContext::State::IDLE, idleState));
