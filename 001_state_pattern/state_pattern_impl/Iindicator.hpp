@@ -2,6 +2,7 @@
 #define _IINDICATOR_HPP
 
 #include "Ilaundry_sensor.hpp"
+#include "Iwater_sensor.hpp"
 
 class IIndicator
 {
@@ -31,8 +32,11 @@ public:
     };
 
     virtual void SetLaundryLevel(LaundryLevel laundryLevel) = 0;
-    virtual void SetRecommendedWaterLevel(WaterLevel laundryLevel) = 0;
+    virtual void SetLaundryLevel(ILaundrySensor::LaundryLevel laundryLevel) = 0;
+    virtual void SetRecommendedWaterLevel(WaterLevel waterLevel) = 0;
+    virtual void SetRecommendedWaterLevel(IWaterSensor::WaterLevel waterLevel) = 0;
     virtual void SetActualWaterLevel(WaterLevel level) = 0;
+    virtual void SetActualWaterLevel(IWaterSensor::WaterLevel level) = 0;
     virtual void SetState(MachineState state) = 0;
     virtual MachineState GetState() const = 0;
 

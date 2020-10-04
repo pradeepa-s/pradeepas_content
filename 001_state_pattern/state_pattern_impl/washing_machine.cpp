@@ -4,6 +4,11 @@
 #include "Iuser_inputs.hpp"
 #include "Iwashing_cycles.hpp"
 #include "Iwater_sensor.hpp"
+#include "Istate_control.hpp"
+#include "idle_state.hpp"
+#include "standby_state.hpp"
+
+using namespace std;
 
 WashingMachine::WashingMachine(
         ILaundrySensor& laundrySensor, IIndicator& indicator,
@@ -11,6 +16,27 @@ WashingMachine::WashingMachine(
     m_laundrySensor(laundrySensor), m_indicator(indicator), m_userInputs(userInputs),
     m_washCycles(washingCycles), m_waterSensor(waterSensor)
 {
+    auto idleState = make_shared<IdleState>(*this, m_laundrySensor);
+    auto standbyState = make_shared<StandbyState>(*this, m_laundrySensor, m_indicator, m_userInputs);
+    m_states.insert(
+            make_pair(
+                IWashingMachineContext::State::IDLE, idleState));
+    m_states.insert(
+            make_pair(
+                IWashingMachineContext::State::STANDBY, standbyState));
+
+    m_currentState = m_states[IWashingMachineContext::State::IDLE];
+}
+
+void WashingMachine::Run2()
+{
+    m_currentState->Run();
+}
+
+void WashingMachine::ChangeState(IWashingMachineContext::State state)
+{
+    m_currentState = m_states[state];
+    m_currentState->Reset();
 }
 
 void WashingMachine::Run()
@@ -154,6 +180,16 @@ IIndicator::WaterLevel WashingMachine::Convert(IWaterSensor::WaterLevel level)
     }
 
     return IIndicator::WaterLevel::NONE;
+}
+
+void WashingMachine::SetWaterLevelTarget(IWaterSensor::WaterLevel level)
+{
+    m_waterLevelTarget = level;
+}
+
+IWaterSensor::WaterLevel WashingMachine::GetWaterLevelTarget() const
+{
+    return m_waterLevelTarget;
 }
 
 IWaterSensor::WaterLevel WashingMachine::GetRecommendedWaterLevel(ILaundrySensor::LaundryLevel level)
