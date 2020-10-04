@@ -38,7 +38,7 @@ GTEST_LIBS = libgtest.a libgtest_main.a
 TESTS = test_washing_machine
 
 OBJ_FILES = idle_state.o standby_state.o fake_water_sensor.o fake_laundry_sensor.o fake_indicator.o washing_machine.o \
-			fake_user_inputs.o fake_washing_cycles.o test_washing_machine.o
+			fake_user_inputs.o fake_washing_cycles.o test_washing_machine.o add_water_state.o
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
