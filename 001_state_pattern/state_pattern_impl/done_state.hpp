@@ -15,6 +15,7 @@ public:
 
     void Run() override;
     void Reset() override;
+    State WhoAmI() { return State::DONE; }
 
 private:
     IWashingMachineContext& m_context;

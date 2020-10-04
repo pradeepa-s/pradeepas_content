@@ -11,7 +11,7 @@ void IdleState::Run()
 {
     if (m_laundrySensor.GetLevel() != ILaundrySensor::LaundryLevel::NONE)
     {
-        m_context.ChangeState(IWashingMachineContext::State::STANDBY);
+        m_context.ChangeState(IWashingMachineState::State::STANDBY);
     }
 }
 

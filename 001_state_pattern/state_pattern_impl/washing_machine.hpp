@@ -39,10 +39,11 @@ public:
     void Run();
 
     void Run2();
-    void ChangeState(IWashingMachineContext::State state) override;
+    void ChangeState(IWashingMachineState::State state) override;
     IWaterSensor::WaterLevel GetRecommendedWaterLevel(ILaundrySensor::LaundryLevel level) override;
     void SetWaterLevelTarget(IWaterSensor::WaterLevel level) override;
     IWaterSensor::WaterLevel GetWaterLevelTarget() const override;
+    IWashingMachineState::State GetPreviousState() const override;
 
 private:
     using State = std::shared_ptr<IWashingMachineState>;
@@ -53,6 +54,7 @@ private:
 
     WashingMachineState m_state {WashingMachineState::IDLE};
     WashingMachineState m_preErrorState {WashingMachineState::IDLE};
+    IWashingMachineState::State m_prevStateName {};
     IWaterSensor::WaterLevel m_recommendedWaterLevel {IWaterSensor::WaterLevel::L2};
     IWaterSensor::WaterLevel m_waterLevelTarget {IWaterSensor::WaterLevel::L2};
 
@@ -65,7 +67,7 @@ private:
     State m_currentState {nullptr};
 
     bool RecommendedWaterLevelReached();
-    std::map<IWashingMachineContext::State, State> m_states;
+    std::map<IWashingMachineState::State, State> m_states;
 };
 
 #endif  // _WASHING_MACHINE_HPP

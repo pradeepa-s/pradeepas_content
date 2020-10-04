@@ -14,7 +14,7 @@ void WashState::Run()
 {
     if (m_washCycles.IsAlgorithmDone())
     {
-        m_context.ChangeState(IWashingMachineContext::State::RINSE);
+        m_context.ChangeState(IWashingMachineState::State::RINSE);
     }
 }
 

@@ -21,7 +21,7 @@ void StandbyState::Run()
     if (m_userInputs.HasStartButtonPressed())
     {
         m_context.SetWaterLevelTarget(recommendedWaterLevel);
-        m_context.ChangeState(IWashingMachineContext::State::ADD_WATER);
+        m_context.ChangeState(IWashingMachineState::State::ADD_WATER);
     }
 }
 

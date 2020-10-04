@@ -31,24 +31,24 @@ WashingMachine::WashingMachine(
 
     m_states.insert(
             make_pair(
-                IWashingMachineContext::State::IDLE, idleState));
+                IWashingMachineState::State::IDLE, idleState));
     m_states.insert(
             make_pair(
-                IWashingMachineContext::State::STANDBY, standbyState));
+                IWashingMachineState::State::STANDBY, standbyState));
     m_states.insert(
             make_pair(
-                IWashingMachineContext::State::ADD_WATER, addWaterState));
+                IWashingMachineState::State::ADD_WATER, addWaterState));
     m_states.insert(
             make_pair(
-                IWashingMachineContext::State::WASH, washState));
+                IWashingMachineState::State::WASH, washState));
     m_states.insert(
             make_pair(
-                IWashingMachineContext::State::SPIN, spinState));
+                IWashingMachineState::State::SPIN, spinState));
     m_states.insert(
             make_pair(
-                IWashingMachineContext::State::DONE, doneState));
+                IWashingMachineState::State::DONE, doneState));
 
-    m_currentState = m_states[IWashingMachineContext::State::IDLE];
+    m_currentState = m_states[IWashingMachineState::State::IDLE];
 }
 
 void WashingMachine::Run2()
@@ -56,8 +56,9 @@ void WashingMachine::Run2()
     m_currentState->Run();
 }
 
-void WashingMachine::ChangeState(IWashingMachineContext::State state)
+void WashingMachine::ChangeState(IWashingMachineState::State state)
 {
+    m_prevStateName = m_currentState->WhoAmI();
     m_currentState = m_states[state];
     m_currentState->Reset();
 }
@@ -173,6 +174,11 @@ void WashingMachine::Run()
         default:
             break;
     }
+}
+
+IWashingMachineState::State WashingMachine::GetPreviousState() const
+{
+    return m_prevStateName;
 }
 
 IIndicator::LaundryLevel WashingMachine::Convert(ILaundrySensor::LaundryLevel level)

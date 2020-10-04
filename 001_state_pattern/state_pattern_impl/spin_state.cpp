@@ -16,7 +16,7 @@ void SpinState::Run()
     {
         m_washCycles.StopSpinAlgorithm();
         m_indicator.SetState(IIndicator::MachineState::DONE);
-        m_context.ChangeState(IWashingMachineContext::State::DONE);
+        m_context.ChangeState(IWashingMachineState::State::DONE);
     }
 }
 

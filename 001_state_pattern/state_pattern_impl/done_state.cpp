@@ -16,7 +16,7 @@ void DoneState::Run()
     {
         m_indicator.SetLaundryLevel(m_laundrySensor.GetLevel());
         m_indicator.SetRecommendedWaterLevel(IIndicator::WaterLevel::NONE);
-        m_context.ChangeState(IWashingMachineContext::State::IDLE);
+        m_context.ChangeState(IWashingMachineState::State::IDLE);
     }
 }
 

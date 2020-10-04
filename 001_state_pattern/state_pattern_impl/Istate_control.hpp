@@ -3,29 +3,19 @@
 
 #include "Iindicator.hpp"
 #include "Iwater_sensor.hpp"
+#include "Iwashing_machine_state.hpp"
 
 class IWashingMachineContext
 {
 public:
-    enum class State
-    {
-        IDLE,
-        STANDBY,
-        ADD_WATER,
-        WASH,
-        RINSE,
-        SPIN,
-        DONE,
-        ERROR
-    };
-
-    virtual void ChangeState(State state) = 0;
+    virtual void ChangeState(IWashingMachineState::State state) = 0;
 
     virtual IIndicator::LaundryLevel Convert(ILaundrySensor::LaundryLevel level) = 0;
     virtual IIndicator::WaterLevel Convert(IWaterSensor::WaterLevel level) = 0;
     virtual IWaterSensor::WaterLevel GetRecommendedWaterLevel(ILaundrySensor::LaundryLevel level) = 0;
     virtual void SetWaterLevelTarget(IWaterSensor::WaterLevel level) = 0;
     virtual IWaterSensor::WaterLevel GetWaterLevelTarget() const = 0;
+    virtual IWashingMachineState::State GetPreviousState() const = 0;
 
     virtual ~IWashingMachineContext() {};
 };

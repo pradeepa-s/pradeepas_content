@@ -13,6 +13,7 @@ public:
 
     void Run() override;
     void Reset() override;
+    State WhoAmI() { return State::IDLE; }
 
 private:
     IWashingMachineContext& m_context;
