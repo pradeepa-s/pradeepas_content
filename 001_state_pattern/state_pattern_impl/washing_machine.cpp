@@ -10,6 +10,8 @@
 #include "add_water_state.hpp"
 #include "wash_state.hpp"
 #include "rinse_state.hpp"
+#include "done_state.hpp"
+#include "spin_state.hpp"
 
 using namespace std;
 
@@ -24,6 +26,9 @@ WashingMachine::WashingMachine(
     auto addWaterState = make_shared<AddWaterState>(*this, m_waterSensor, m_washCycles);
     auto washState = make_shared<WashState>(*this, m_indicator, m_washCycles);
     auto rinseState = make_shared<RinseState>(*this, m_indicator, m_washCycles);
+    auto spinState = make_shared<SpinState>(*this, m_washCycles, m_indicator);
+    auto doneState = make_shared<DoneState>(*this, m_laundrySensor, m_indicator);
+
     m_states.insert(
             make_pair(
                 IWashingMachineContext::State::IDLE, idleState));
@@ -36,6 +41,12 @@ WashingMachine::WashingMachine(
     m_states.insert(
             make_pair(
                 IWashingMachineContext::State::WASH, washState));
+    m_states.insert(
+            make_pair(
+                IWashingMachineContext::State::SPIN, spinState));
+    m_states.insert(
+            make_pair(
+                IWashingMachineContext::State::DONE, doneState));
 
     m_currentState = m_states[IWashingMachineContext::State::IDLE];
 }
