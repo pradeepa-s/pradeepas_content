@@ -12,6 +12,11 @@ AddWaterState::AddWaterState(IWashingMachineContext& stateControl, IWaterSensor&
 
 void AddWaterState::Run()
 {
+    if (m_washCycles.IsInError())
+    {
+        m_context.ChangeState(IWashingMachineState::State::ERROR);
+    }
+
     if (RecommendedWaterLevelReached())
     {
         m_washCycles.StopWater();

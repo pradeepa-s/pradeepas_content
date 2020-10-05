@@ -45,6 +45,9 @@ WashingMachine::WashingMachine(
                 IWashingMachineState::State::WASH, washState));
     m_states.insert(
             make_pair(
+                IWashingMachineState::State::RINSE, rinseState));
+    m_states.insert(
+            make_pair(
                 IWashingMachineState::State::SPIN, spinState));
     m_states.insert(
             make_pair(
@@ -56,8 +59,9 @@ WashingMachine::WashingMachine(
     m_currentState = m_states[IWashingMachineState::State::IDLE];
 }
 
-void WashingMachine::Run2()
+void WashingMachine::Run()
 {
+    m_indicator.SetActualWaterLevel(m_waterSensor.GetLevel());
     m_currentState->Run();
 }
 
@@ -68,7 +72,7 @@ void WashingMachine::ChangeState(IWashingMachineState::State state)
     m_currentState->Reset();
 }
 
-void WashingMachine::Run()
+void WashingMachine::Run2()
 {
     m_indicator.SetActualWaterLevel(Convert(m_waterSensor.GetLevel()));
 

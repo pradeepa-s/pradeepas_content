@@ -12,6 +12,11 @@ SpinState::SpinState(IWashingMachineContext& stateControl, IWashingCycles& washi
 
 void SpinState::Run()
 {
+    if (m_washCycles.IsInError())
+    {
+        m_context.ChangeState(IWashingMachineState::State::ERROR);
+    }
+
     if (m_washCycles.IsAlgorithmDone())
     {
         m_washCycles.StopSpinAlgorithm();

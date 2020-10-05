@@ -12,6 +12,11 @@ RinseState::RinseState(IWashingMachineContext& stateControl, IIndicator& indicat
 
 void RinseState::Run()
 {
+    if (m_washCycles.IsInError())
+    {
+        m_context.ChangeState(IWashingMachineState::State::ERROR);
+    }
+
     if (m_washCycles.IsAlgorithmDone())
     {
         m_context.ChangeState(IWashingMachineState::State::SPIN);

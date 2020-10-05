@@ -37,7 +37,6 @@ public:
             IWashingCycles& washingCycles, IWaterSensor& waterSensor);
 
     void Run();
-
     void Run2();
     void ChangeState(IWashingMachineState::State state) override;
     IWaterSensor::WaterLevel GetRecommendedWaterLevel(ILaundrySensor::LaundryLevel level) override;
