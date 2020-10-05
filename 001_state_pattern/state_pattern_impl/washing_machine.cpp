@@ -12,6 +12,7 @@
 #include "rinse_state.hpp"
 #include "done_state.hpp"
 #include "spin_state.hpp"
+#include "error_state.hpp"
 
 using namespace std;
 
@@ -28,6 +29,7 @@ WashingMachine::WashingMachine(
     auto rinseState = make_shared<RinseState>(*this, m_indicator, m_washCycles);
     auto spinState = make_shared<SpinState>(*this, m_washCycles, m_indicator);
     auto doneState = make_shared<DoneState>(*this, m_laundrySensor, m_indicator);
+    auto errorState = make_shared<ErrorState>(*this, m_washCycles, m_indicator, m_userInputs);
 
     m_states.insert(
             make_pair(
@@ -47,6 +49,9 @@ WashingMachine::WashingMachine(
     m_states.insert(
             make_pair(
                 IWashingMachineState::State::DONE, doneState));
+    m_states.insert(
+            make_pair(
+                IWashingMachineState::State::ERROR, errorState));
 
     m_currentState = m_states[IWashingMachineState::State::IDLE];
 }

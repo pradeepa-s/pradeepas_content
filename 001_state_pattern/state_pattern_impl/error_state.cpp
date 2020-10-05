@@ -23,7 +23,7 @@ void ErrorState::Run()
     {
         m_washCycles.Reset();
         m_indicator.SetState(IIndicator::MachineState::IDLE);
-        m_context.ChangeState(IWashingMachineContext::State::IDLE);
+        m_context.ChangeState(IWashingMachineState::State::IDLE);
     }
 }
 

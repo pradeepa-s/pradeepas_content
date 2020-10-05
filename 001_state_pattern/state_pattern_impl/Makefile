@@ -14,7 +14,7 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-GTEST_DIR = /cygdrive/i/my_projects/googletest/googletest
+GTEST_DIR = /cygdrive/e/gtest/googletest/googletest
 
 # Points to the location of the Google Test libraries
 GTEST_LIB_DIR = .
@@ -39,7 +39,7 @@ TESTS = test_washing_machine
 
 OBJ_FILES = idle_state.o standby_state.o fake_water_sensor.o fake_laundry_sensor.o fake_indicator.o washing_machine.o \
 			fake_user_inputs.o fake_washing_cycles.o test_washing_machine.o add_water_state.o \
-			wash_state.o rinse_state.o spin_state.o done_state.o
+			wash_state.o rinse_state.o spin_state.o done_state.o error_state.o
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.

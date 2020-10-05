@@ -23,7 +23,7 @@ private:
     IWashingCycles& m_washCycles;
     IIndicator& m_indicator;
     IUserInputs& m_userInputs;
-    IWashingMachineContext::State m_preErrorState;
+    IWashingMachineState::State m_preErrorState;
 };
 
 #endif // _ERROR_STATE_HPP
