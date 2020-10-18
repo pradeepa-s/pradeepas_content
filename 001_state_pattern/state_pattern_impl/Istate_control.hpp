@@ -10,8 +10,6 @@ class IWashingMachineContext
 public:
     virtual void ChangeState(IWashingMachineState::State state) = 0;
 
-    virtual IIndicator::LaundryLevel Convert(ILaundrySensor::LaundryLevel level) = 0;
-    virtual IIndicator::WaterLevel Convert(IWaterSensor::WaterLevel level) = 0;
     virtual IWaterSensor::WaterLevel GetRecommendedWaterLevel(ILaundrySensor::LaundryLevel level) = 0;
     virtual void SetWaterLevelTarget(IWaterSensor::WaterLevel level) = 0;
     virtual IWaterSensor::WaterLevel GetWaterLevelTarget() const = 0;
