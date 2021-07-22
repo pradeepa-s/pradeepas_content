@@ -12,7 +12,8 @@ add_subdirectory(../googletest gtest)
 # set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 # FetchContent_MakeAvailable(googletest)
 
-add_executable(tmp112_lib_test test_tmp112_sensor.cpp tmp112_sensor.c)
+add_executable(
+    tmp112_lib_test test_tmp112_sensor.cpp tmp112_sensor.c fake_i2c_driver.cpp)
 target_link_libraries(tmp112_lib_test gtest_main)
 
 include(GoogleTest)
