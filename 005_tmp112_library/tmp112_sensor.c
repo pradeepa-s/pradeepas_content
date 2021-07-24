@@ -1,9 +1,9 @@
 #include "tmp112_sensor.h"
 #include <string.h>
-#include <stdio.h>
 
 
 static double transform_to_centigrades(uint8_t* register_data);
+static double transform_to_centigrades_ex(uint8_t* register_data);
 static tmp112_tx_func i2c_tx = 0;
 static tmp112_rx_func i2c_rx = 0;
 static uint8_t slave_address = 0;
@@ -34,17 +34,60 @@ double tmp112_sensor_get_temperature()
     return transform_to_centigrades(read_data);
 }
 
+double tmp112_sensor_get_temperature_ex()
+{
+    uint8_t write_data = 0x00;
+    i2c_tx(slave_address, &write_data, 1);
+
+    uint8_t read_data[2];
+    i2c_rx(slave_address, read_data, 2);
+
+    return transform_to_centigrades_ex(read_data);
+}
+
+void tmp112_sensor_set_extended_mode(uint8_t enable)
+{
+    uint8_t write_data = 0x01;
+    i2c_tx(slave_address, &write_data, 1);
+
+    uint8_t read_data[2];
+    i2c_rx(slave_address, read_data, 2);
+
+    uint8_t update_write[3];
+    update_write[0] = 0x01;
+    update_write[1] = 0x00;
+    update_write[2] = 0x10;
+    i2c_tx(slave_address, update_write, 3);
+}
+
 double transform_to_centigrades(uint8_t* register_data)
 {
-    uint16_t binary_data = 0;
-    memcpy(&binary_data, register_data, 2);
+    const uint16_t msb = register_data[0] << 4;
+    const uint16_t lsb = register_data[1] >> 4;
 
-    int32_t val_before_resolution = binary_data;
-    if (binary_data & 0x800)
+    uint16_t temperature_word = (msb & 0x0FF0) | (lsb & 0x000F) ;
+    int32_t val_before_resolution = temperature_word;
+
+    if (temperature_word & 0x800)
     {
-        binary_data = ((~binary_data) & 0xFFF) + 1;
-        val_before_resolution = -1 * binary_data;
+    	temperature_word = ((~temperature_word) & 0xFFF) + 1;
+        val_before_resolution = -1 * temperature_word;
     }
-    double temp = val_before_resolution * 0.0625;
-    return temp;
+    return val_before_resolution * 0.0625;
+}
+
+double transform_to_centigrades_ex(uint8_t* register_data)
+{
+    const uint16_t msb = register_data[0] << 5;
+    const uint16_t lsb = register_data[1] >> 3;
+
+    uint16_t temperature_word = (msb & 0x1FE0) | (lsb & 0x001F) ;
+    int32_t val_before_resolution = temperature_word;
+
+    if (temperature_word & 0x1000)
+    {
+    	temperature_word = ((~temperature_word) & 0x1FFF) + 1;
+        val_before_resolution = -1 * temperature_word;
+    }
+    return val_before_resolution * 0.0625;
 }
