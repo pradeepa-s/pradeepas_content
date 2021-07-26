@@ -55,6 +55,11 @@ void FakeTmp112Sensor::tx(vector<uint8_t> txBuffer)
 
 vector<uint8_t> FakeTmp112Sensor::rx()
 {
+    // std::cout << "Read::::" << std::endl;
+    //
+    // for (const auto v: rxBytes)
+    //     std::cout << static_cast<unsigned>(v) << std::endl;
+    //
     return rxBytes;
 }
 
@@ -80,27 +85,43 @@ void FakeTmp112Sensor::interpret(uint8_t val)
             break;
 
         case States::GET_WRITE_VALUE_MSB:
-            update_registers_msb(val);
+            update_pointed_register_msb(val);
             m_state = States::GET_WRITE_VALUE_LSB;
             break;
 
         case States::GET_WRITE_VALUE_LSB:
-            update_registers_lsb(val);
+            update_pointed_register_lsb(val);
             m_state = States::IDLE;
             break;
     };
 }
 
-void FakeTmp112Sensor::update_registers_lsb(uint8_t lsb)
+void FakeTmp112Sensor::update_register(uint8_t reg, uint8_t msb, uint8_t lsb)
 {
-    uint16_t lsb16 {lsb};
-    m_register_file[m_pointer] = (m_register_file[m_pointer] & 0xFF00) | lsb16;
+    update_register_msb(reg, msb);
+    update_register_lsb(reg, lsb);
 }
 
-void FakeTmp112Sensor::update_registers_msb(uint8_t msb)
+void FakeTmp112Sensor::update_pointed_register_lsb(uint8_t lsb)
+{
+    update_register_lsb(m_pointer, lsb);
+}
+
+void FakeTmp112Sensor::update_pointed_register_msb(uint8_t msb)
+{
+    update_register_msb(m_pointer, msb);
+}
+
+void FakeTmp112Sensor::update_register_lsb(uint8_t reg, uint8_t lsb)
+{
+    uint16_t lsb16 {lsb};
+    m_register_file[reg] = (m_register_file[reg] & 0xFF00) | lsb16;
+}
+
+void FakeTmp112Sensor::update_register_msb(uint8_t reg, uint8_t msb)
 {
     uint16_t msb16 {static_cast<uint16_t>(static_cast<uint16_t>(msb) << 8)};
-    m_register_file[m_pointer] = (m_register_file[m_pointer] & 0xFF00) | msb16;
+    m_register_file[reg] = (m_register_file[reg] & 0x00FF) | msb16;
 }
 
 void FakeTmp112Sensor::set_temperature(const double temperature)
@@ -120,8 +141,7 @@ void FakeTmp112Sensor::set_temperature(const double temperature)
     uint8_t msb {static_cast<uint8_t>(static_cast<uint16_t>(val & 0xFF0) >> 4)};
     uint8_t lsb {static_cast<uint8_t>(static_cast<uint16_t>(val & 0x00F) << 4)};
 
-    rxBytes.push_back(msb);
-    rxBytes.push_back(lsb);
+    update_register(0, msb, lsb);
 }
 
 void FakeTmp112Sensor::set_temperature_extended(const double temperature)
@@ -142,8 +162,7 @@ void FakeTmp112Sensor::set_temperature_extended(const double temperature)
     uint8_t lsb {static_cast<uint8_t>(static_cast<uint16_t>(val & 0x001F) << 3)};
     lsb |= 0x01;
 
-    rxBytes.push_back(msb);
-    rxBytes.push_back(lsb);
+    update_register(0, msb, lsb);
 }
 
 void FakeTmp112Sensor::prep_response()
@@ -152,12 +171,41 @@ void FakeTmp112Sensor::prep_response()
     {
         m_lastCommand = "Read temperature";
     }
+
+    rxBytes.clear();
+    rxBytes.push_back((m_register_file[m_pointer] & 0xFF00) >> 8);
+    rxBytes.push_back(m_register_file[m_pointer] & 0x00FF);
 }
 
 bool FakeTmp112Sensor::is_extended_mode()
 {
-    // print_reg();
     return m_register_file[1] & 0x0010;
+}
+
+double FakeTmp112Sensor::get_converstion_rate()
+{
+    const uint8_t rate {static_cast<uint8_t>((m_register_file[1] & 0xC0) >> 6)};
+
+    if (rate == 0)
+    {
+        return 0.25;
+    }
+    else if (rate == 1)
+    {
+        return 1;
+    }
+    else if (rate == 2)
+    {
+        return 4;
+    }
+    else if (rate == 3)
+    {
+        return 8;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 void FakeTmp112Sensor::print_reg()

@@ -14,11 +14,15 @@ public:
     void set_temperature(const double temperature);
     void set_temperature_extended(const double temperature);
     bool is_extended_mode();
+    double get_converstion_rate();
 
     void interpret(uint8_t val);
     void prep_response();
-    void update_registers_msb(uint8_t val);
-    void update_registers_lsb(uint8_t val);
+    void update_register(uint8_t reg, uint8_t msb, uint8_t lsb);
+    void update_register_lsb(uint8_t reg, uint8_t lsb);
+    void update_register_msb(uint8_t reg, uint8_t msb);
+    void update_pointed_register_msb(uint8_t val);
+    void update_pointed_register_lsb(uint8_t val);
     void print_reg();
 
     std::vector<uint8_t> txBytes {};

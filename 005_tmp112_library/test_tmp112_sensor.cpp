@@ -4,6 +4,7 @@ extern "C" {
 }
 #include "fake_i2c_driver.hpp"
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -26,7 +27,7 @@ protected:
         EXPECT_EQ(fakeSensor.m_lastCommand, "Read temperature");
     }
 
-    void IsLastI2CTransactionSetExtendedMode()
+    void IsInExtendedMode()
     {
         EXPECT_TRUE(fakeSensor.is_extended_mode());
     }
@@ -45,6 +46,11 @@ protected:
     void SetNextTemperatureReadingInExtendedMode(const double nextReadingInCentigrades)
     {
         fakeSensor.set_temperature_extended(nextReadingInCentigrades);
+    }
+
+    void IsConverstionRateSetTo(const double rate)
+    {
+        EXPECT_EQ(rate, fakeSensor.get_converstion_rate());
     }
 
     static constexpr uint8_t SLAVE_ADDRESS {0x48};
@@ -85,7 +91,7 @@ TEST_F(TestTmp112Sensor, get_temperature_returns_negative_value_in_centigrades)
 TEST_F(TestTmp112Sensor, shall_set_extended_mode)
 {
     tmp112_sensor_set_extended_mode(1);
-    IsLastI2CTransactionSetExtendedMode();
+    IsInExtendedMode();
 }
 
 TEST_F(TestTmp112Sensor, get_temperature_ex_returns_value_in_centigrades_in_extended_mode)
@@ -100,4 +106,29 @@ TEST_F(TestTmp112Sensor, get_temperature_ex_returns_negative_value_in_centigrade
     SetNextTemperatureReadingInExtendedMode(-55);
     tmp112_sensor_set_extended_mode(1);
     EXPECT_EQ(-55, tmp112_sensor_get_temperature_ex());
+}
+
+TEST_F(TestTmp112Sensor, shall_be_able_to_set_the_conversion_rate)
+{
+    std::map<TMP112_CONVERSION_RATE, double> rates { {HZ_0_25, 0.25}, {HZ_1, 1}, {HZ_4, 4}, {HZ_8, 8} };
+
+    for (const auto& rate: rates)
+    {
+        tmp112_sensor_set_conversion_rate(rate.first);
+        IsConverstionRateSetTo(rate.second);
+    }
+}
+
+TEST_F(TestTmp112Sensor, setting_converstion_rate_shall_not_change_other_conf)
+{
+    tmp112_sensor_set_extended_mode(1);
+    tmp112_sensor_set_conversion_rate(HZ_8);
+    IsInExtendedMode();
+}
+
+TEST_F(TestTmp112Sensor, setting_extended_mode_shall_not_change_other_conf)
+{
+    tmp112_sensor_set_conversion_rate(HZ_8);
+    tmp112_sensor_set_extended_mode(1);
+    IsConverstionRateSetTo(8);
 }
