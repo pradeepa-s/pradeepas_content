@@ -95,21 +95,27 @@ TEST_F(TestTmp112Sensor, get_temperature_returns_negative_value_in_centigrades)
 
 TEST_F(TestTmp112Sensor, shall_set_extended_mode)
 {
-    tmp112_sensor_set_extended_mode(1);
+    TMP112_CONFIG config;
+    config.extended_mode = TMP112_EXTENDED_MODE_ENABLED;
+    tmp112_sensor_set_config(config);
     IsInExtendedMode();
 }
 
 TEST_F(TestTmp112Sensor, get_temperature_ex_returns_value_in_centigrades_in_extended_mode)
 {
     SetNextTemperatureReadingInExtendedMode(149.9375);
-    tmp112_sensor_set_extended_mode(1);
+    TMP112_CONFIG config;
+    config.extended_mode = TMP112_EXTENDED_MODE_ENABLED;
+    tmp112_sensor_set_config(config);
     EXPECT_EQ(149.9375, tmp112_sensor_get_temperature_ex());
 }
 
 TEST_F(TestTmp112Sensor, get_temperature_ex_returns_negative_value_in_centigrades_in_extended_mode)
 {
     SetNextTemperatureReadingInExtendedMode(-55);
-    tmp112_sensor_set_extended_mode(1);
+    TMP112_CONFIG config;
+    config.extended_mode = TMP112_EXTENDED_MODE_ENABLED;
+    tmp112_sensor_set_config(config);
     EXPECT_EQ(-55, tmp112_sensor_get_temperature_ex());
 }
 
@@ -119,22 +125,20 @@ TEST_F(TestTmp112Sensor, shall_be_able_to_set_the_conversion_rate)
 
     for (const auto& rate: rates)
     {
-        tmp112_sensor_set_conversion_rate(rate.first);
+        TMP112_CONFIG config;
+        config.conversion_rate = rate.first;
+        tmp112_sensor_set_config(config);
         IsConverstionRateSetTo(rate.second);
     }
 }
 
-TEST_F(TestTmp112Sensor, setting_converstion_rate_shall_not_change_other_conf)
+TEST_F(TestTmp112Sensor, set_extended_mode_and_conversion_rate)
 {
-    tmp112_sensor_set_extended_mode(1);
-    tmp112_sensor_set_conversion_rate(HZ_8);
+    TMP112_CONFIG config;
+    config.extended_mode = TMP112_EXTENDED_MODE_ENABLED;
+    config.conversion_rate = HZ_8;
+    tmp112_sensor_set_config(config);
     IsInExtendedMode();
-}
-
-TEST_F(TestTmp112Sensor, setting_extended_mode_shall_not_change_other_conf)
-{
-    tmp112_sensor_set_conversion_rate(HZ_8);
-    tmp112_sensor_set_extended_mode(1);
     IsConverstionRateSetTo(8);
 }
 

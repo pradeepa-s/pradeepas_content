@@ -47,28 +47,14 @@ double tmp112_sensor_get_temperature_ex()
     return transform_to_centigrades_ex(read_data);
 }
 
-void tmp112_sensor_set_conversion_rate(TMP112_CONVERSION_RATE rate)
+void tmp112_sensor_set_config(TMP112_CONFIG config)
 {
-    uint8_t reg_val = 0;
-    if (rate == HZ_1)
-    {
-        reg_val = 0x40;
-    }
-    else if (rate == HZ_4)
-    {
-        reg_val = 0x80;
-    }
-    else if (rate == HZ_8)
-    {
-        reg_val = 0xC0;
-    }
+    uint8_t msb_val = 0;
+    uint8_t lsb_val = 0;
 
-    update_conf_register(0x00, 0x00, 0xC0, reg_val);
-}
-
-void tmp112_sensor_set_extended_mode(uint8_t enable)
-{
-    update_conf_register(0x00, 0x00, 0x10, (enable << 4));
+    /* lsb_val = config.conversion_rate | config.thermostat_mode | config.alert_polartiy | config.fault_queue | config.extended_mode; */
+    lsb_val = config.conversion_rate | config.extended_mode;
+    update_conf_register(0xff, msb_val, 0xD0, lsb_val);
 }
 
 void tmp112_sensor_shutdown(uint8_t enable)
