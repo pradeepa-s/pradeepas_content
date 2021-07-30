@@ -15,6 +15,7 @@ public:
     void set_temperature_extended(const double temperature);
     bool is_extended_mode();
     double get_converstion_rate();
+    bool is_shutdown();
 
     void interpret(uint8_t val);
     void prep_response();

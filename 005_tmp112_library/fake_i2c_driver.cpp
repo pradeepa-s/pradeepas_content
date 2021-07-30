@@ -208,6 +208,11 @@ double FakeTmp112Sensor::get_converstion_rate()
     }
 }
 
+bool FakeTmp112Sensor::is_shutdown()
+{
+    return m_register_file[1] & 0x0100;
+}
+
 void FakeTmp112Sensor::print_reg()
 {
     for (const auto& reg: m_register_file)

@@ -17,5 +17,6 @@ double tmp112_sensor_get_temperature();
 double tmp112_sensor_get_temperature_ex();
 void tmp112_sensor_set_extended_mode(uint8_t enable);
 void tmp112_sensor_set_conversion_rate(TMP112_CONVERSION_RATE rate);
+void tmp112_sensor_shutdown(uint8_t enable);
 
 #endif //  TMP112_SENSOR

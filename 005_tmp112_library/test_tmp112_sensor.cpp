@@ -53,6 +53,11 @@ protected:
         EXPECT_EQ(rate, fakeSensor.get_converstion_rate());
     }
 
+    void IsShutdown(bool enable)
+    {
+        EXPECT_EQ(enable, fakeSensor.is_shutdown());
+    }
+
     static constexpr uint8_t SLAVE_ADDRESS {0x48};
     static constexpr uint8_t SLAVE_ADDRESS_2 {0x11};
 
@@ -131,4 +136,16 @@ TEST_F(TestTmp112Sensor, setting_extended_mode_shall_not_change_other_conf)
     tmp112_sensor_set_conversion_rate(HZ_8);
     tmp112_sensor_set_extended_mode(1);
     IsConverstionRateSetTo(8);
+}
+
+TEST_F(TestTmp112Sensor, setting_shutdown_mode)
+{
+    tmp112_sensor_shutdown(1);
+    IsShutdown(true);
+}
+
+TEST_F(TestTmp112Sensor, disable_shutdown_mode)
+{
+    tmp112_sensor_shutdown(0);
+    IsShutdown(false);
 }

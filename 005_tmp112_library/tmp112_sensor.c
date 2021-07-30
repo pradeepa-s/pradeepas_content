@@ -90,6 +90,21 @@ void tmp112_sensor_set_extended_mode(uint8_t enable)
     i2c_tx(slave_address, update_write, 3);
 }
 
+void tmp112_sensor_shutdown(uint8_t enable)
+{
+    uint8_t write_data = 0x01;
+    i2c_tx(slave_address, &write_data, 1);
+
+    uint8_t read_data[2];
+    i2c_rx(slave_address, read_data, 2);
+
+    uint8_t update_write[3];
+    update_write[0] = 0x01;
+    update_write[1] = (read_data[0] & 0xFE) | (enable << 0);
+    update_write[2] = read_data[1];
+    i2c_tx(slave_address, update_write, 3);
+}
+
 double transform_to_centigrades(uint8_t* register_data)
 {
     const uint16_t msb = register_data[0] << 4;
