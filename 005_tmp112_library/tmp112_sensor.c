@@ -1,10 +1,11 @@
 #include "tmp112_sensor.h"
-#include <string.h>
 
 
 static double transform_to_centigrades(uint8_t* register_data);
 static double transform_to_centigrades_ex(uint8_t* register_data);
 static double get_rate_register(uint8_t* register_data);
+void update_conf_register(uint8_t msb_mask, uint8_t msb_val, uint8_t lsb_mask, uint8_t lsb_val);
+
 static tmp112_tx_func i2c_tx = 0;
 static tmp112_rx_func i2c_rx = 0;
 static uint8_t slave_address = 0;
@@ -62,35 +63,20 @@ void tmp112_sensor_set_conversion_rate(TMP112_CONVERSION_RATE rate)
         reg_val = 0xC0;
     }
 
-    uint8_t write_data = 0x01;
-    i2c_tx(slave_address, &write_data, 1);
-
-    uint8_t read_data[2];
-    i2c_rx(slave_address, read_data, 2);
-
-    uint8_t update_write[3];
-    update_write[0] = 0x01;
-    update_write[1] = read_data[0];
-    update_write[2] = (read_data[1] & 0x3F) | reg_val;
-    i2c_tx(slave_address, update_write, 3);
+    update_conf_register(0x00, 0x00, 0xC0, reg_val);
 }
 
 void tmp112_sensor_set_extended_mode(uint8_t enable)
 {
-    uint8_t write_data = 0x01;
-    i2c_tx(slave_address, &write_data, 1);
-
-    uint8_t read_data[2];
-    i2c_rx(slave_address, read_data, 2);
-
-    uint8_t update_write[3];
-    update_write[0] = 0x01;
-    update_write[1] = read_data[0];
-    update_write[2] = (read_data[1] & 0xEF) | (enable << 4);
-    i2c_tx(slave_address, update_write, 3);
+    update_conf_register(0x00, 0x00, 0x10, (enable << 4));
 }
 
 void tmp112_sensor_shutdown(uint8_t enable)
+{
+    update_conf_register(0x01, (enable << 0), 0x00, 0x00);
+}
+
+void update_conf_register(uint8_t msb_mask, uint8_t msb_val, uint8_t lsb_mask, uint8_t lsb_val)
 {
     uint8_t write_data = 0x01;
     i2c_tx(slave_address, &write_data, 1);
@@ -100,8 +86,8 @@ void tmp112_sensor_shutdown(uint8_t enable)
 
     uint8_t update_write[3];
     update_write[0] = 0x01;
-    update_write[1] = (read_data[0] & 0xFE) | (enable << 0);
-    update_write[2] = read_data[1];
+    update_write[1] = (read_data[0] & ~msb_mask) | (msb_val & msb_mask);
+    update_write[2] = (read_data[1] & ~lsb_mask) | (lsb_val & lsb_mask);
     i2c_tx(slave_address, update_write, 3);
 }
 
