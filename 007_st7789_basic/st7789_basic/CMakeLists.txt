@@ -60,7 +60,7 @@ target_include_directories(st7789_basic PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(st7789_basic 
-       hardware_spi 
+       hardware_spi lvgl
         )
 
 pico_add_extra_outputs(st7789_basic)

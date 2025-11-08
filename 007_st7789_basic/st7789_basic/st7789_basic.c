@@ -2,8 +2,11 @@
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 #include "hardware/structs/systick.h"
+#include "lvgl.h"
 // #include "hardware/gpio.h"
 // #include "pico/time.h"
+
+static bool pending_xfer = false;
 
 static const bool LCD_CMD = false;
 static const bool LCD_DATA = true;
@@ -36,6 +39,57 @@ extern void isr_systick()
 {
     tick_count++; 
 }
+
+static void send_lcd_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
+{
+    if (!disp || !cmd) {
+        return;
+    }
+
+    while (pending_xfer);
+
+    gpio_put(GPIO_LCD_DCX, LCD_CMD);
+    gpio_put(GPIO_SPI0_CSn, false);
+    spi_set_format(spi0, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+    spi_write_blocking(spi0, cmd, cmd_size);
+    
+    if (param) {
+        gpio_put(GPIO_LCD_DCX, LCD_DATA);
+        spi_write_blocking(spi0, param, param_size);
+    }
+
+    gpio_put(GPIO_SPI0_CSn, true);
+}
+
+static void send_lcd_data(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+{
+    if (!disp || !cmd) {
+        return;
+    }
+
+    // Send the LCD command first
+    gpio_put(GPIO_LCD_DCX, LCD_CMD);
+    gpio_put(GPIO_SPI0_CSn, false);
+    spi_set_format(spi0, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+    spi_write_blocking(spi0, cmd, cmd_size);
+   
+    // Send LCD data if available
+    if (param) {
+        // The data write is alwways 16 bits.
+        // The data transfer is MSB first. Refer 8.8.42 in ST7789 datasheet
+        uint16_t* data = (uint16_t*)param;
+        size_t data_size = param_size / 2;
+        spi_set_format(spi0, 16, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+        gpio_put(GPIO_LCD_DCX, LCD_DATA);
+        spi_write16_blocking(spi0, data, data_size);
+    }
+
+    gpio_put(GPIO_SPI0_CSn, true);
+
+    // Tell LVGL that the transfer is complete and we are ready for the next set of data.
+    lv_display_flush_ready(disp);
+}
+
 static void initialise_lcd_hw()
 {
 	// Backlight
