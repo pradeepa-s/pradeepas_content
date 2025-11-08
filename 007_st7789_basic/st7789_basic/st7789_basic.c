@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
-// #include "hardware/gpio.h"
 #include "hardware/spi.h"
+#include "hardware/structs/systick.h"
+// #include "hardware/gpio.h"
 // #include "pico/time.h"
 
 static const bool LCD_CMD = false;
@@ -16,6 +17,25 @@ const uint GPIO_SPI0_CSn = 17;
 const uint GPIO_SPI0_SCK = 18;
 const uint GPIO_SPI0_TX = 19;
 
+static uint32_t tick_count = 0;
+
+uint32_t get_tick_count()
+{
+    return tick_count;
+}
+
+void setup_isr()
+{
+    systick_hw_t* systick = systick_hw;
+    systick->cvr = 0x00;
+    systick->csr = 0x07;
+    systick->rvr = 124999;
+}
+
+extern void isr_systick()
+{
+    tick_count++; 
+}
 static void initialise_lcd_hw()
 {
 	// Backlight
@@ -60,7 +80,7 @@ static void initialise_lcd_hw()
 int main()
 {
     stdio_init_all();
-
+    setup_isr();
     initialise_lcd_hw();
     while (true) {
         printf("Hello, world!\n");
