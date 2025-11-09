@@ -10,7 +10,8 @@ static bool pending_xfer = false;
 
 static const bool LCD_CMD = false;
 static const bool LCD_DATA = true;
-
+static const uint32_t LCD_H_RES = 240;
+static const uint32_t LCD_V_RES = 320;
 const uint GPIO_LCD_BACKLIGHT_PIN = 2;
 const uint GPIO_LCD_DCX = 3;
 const uint GPIO_LCD_RESETn = 4;
@@ -21,6 +22,8 @@ const uint GPIO_SPI0_SCK = 18;
 const uint GPIO_SPI0_TX = 19;
 
 static uint32_t tick_count = 0;
+
+static lv_display_t *lcd_disp = NULL;
 
 uint32_t get_tick_count()
 {
@@ -130,14 +133,60 @@ static void initialise_lcd_hw()
     gpio_put(GPIO_SPI0_CSn, true);
 }
 
+static void initialise_lvgl_framework()
+{
+    // Initialise the library
+	lv_init();
+
+    // Set the tick count callbcak
+    lv_tick_set_cb(get_tick_count);
+
+    // Setup the display
+    lcd_disp = lv_st7789_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE, send_lcd_cmd, send_lcd_data);
+
+    // Colour setting is governed by LV_COLOR_DEPTH. It's set to 16 which leads to RGB565 color format
+    // being native.
+    lv_disp_set_rotation(lcd_disp, LV_DISP_ROTATION_0);
+
+    lv_color_t *buf1 = NULL;
+    lv_color_t *buf2 = NULL;
+
+    // For partial rendering the buffer is set to 1/10th of display size
+    const uint32_t buf_size = LCD_H_RES * LCD_V_RES * lv_color_format_get_size(lv_display_get_color_format(lcd_disp)) / 10;
+    buf1 = lv_malloc(buf_size);
+    if (buf1 == NULL) {
+        printf("Buffer1 allocation failed!\n\r");
+        return;
+    }
+
+    buf2 = lv_malloc(buf_size);
+    if (buf2 == NULL) {
+        printf("Buffer2 allocation failed!\n\r");
+        lv_free(buf1);
+        return;
+    }
+
+    lv_display_set_buffers(lcd_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
+}
+
+static void ui_init(lv_display_t *disp)
+{
+    /* set screen background to yellow */
+    lv_obj_t *scr = lv_screen_active();
+    lv_obj_set_style_bg_color(scr, lv_color_hex(0xFFFB00), 0);
+    lv_obj_set_style_bg_opa(scr, LV_OPA_100, 0);
+}
 
 int main()
 {
     stdio_init_all();
     setup_isr();
     initialise_lcd_hw();
+    initialise_lvgl_framework();
+    ui_init(lcd_disp);
+
+    printf("Hello, world!\n");
     while (true) {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
+        lv_timer_handler();
     }
 }
