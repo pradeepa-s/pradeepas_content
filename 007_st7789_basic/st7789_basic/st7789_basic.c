@@ -6,6 +6,14 @@
 // #include "hardware/gpio.h"
 // #include "pico/time.h"
 
+#define TOUCH_SCREEN_IRQ   (11)
+#define GPIO_SPI1_CSn  (13)
+#define GPIO_SPI1_RX   (12)
+#define GPIO_SPI1_SCK  (14)
+#define GPIO_SPI1_TX   (15)
+
+static bool touch_detected = false;
+
 static bool pending_xfer = false;
 
 static const bool LCD_CMD = false;
@@ -177,6 +185,46 @@ static void ui_init(lv_display_t *disp)
     lv_obj_set_style_bg_opa(scr, LV_OPA_100, 0);
 }
 
+void touch_irq()
+{
+    // Don't enable interrupts until we detect the release. The release is detected by
+    // contnuously reading the touch sensor and evaluating the reading.
+    gpio_acknowledge_irq(TOUCH_SCREEN_IRQ, GPIO_IRQ_EDGE_FALL);
+    gpio_set_irq_enabled(TOUCH_SCREEN_IRQ, GPIO_IRQ_EDGE_FALL, false);
+    touch_detected = true;
+}
+
+void init_touch_screen()
+{
+    // Configure the GPIO that has the interrupt
+    gpio_init(TOUCH_SCREEN_IRQ);
+    gpio_set_dir(TOUCH_SCREEN_IRQ, false);
+
+    // Enable the interrupt and set the callback
+    irq_set_enabled(IO_IRQ_BANK0, true);
+    gpio_add_raw_irq_handler(TOUCH_SCREEN_IRQ, touch_irq);
+
+    // Configure GPIOs used by SPI
+    gpio_init(GPIO_SPI1_CSn);  // Software controlled
+    gpio_init(GPIO_SPI1_RX);
+    gpio_init(GPIO_SPI1_SCK);
+    gpio_init(GPIO_SPI1_TX);
+
+    // Configure SPI
+    gpio_set_dir(GPIO_SPI1_CSn, GPIO_OUT);
+    gpio_set_function(GPIO_SPI1_RX, GPIO_FUNC_SPI);
+    gpio_set_function(GPIO_SPI1_SCK, GPIO_FUNC_SPI);
+    gpio_set_function(GPIO_SPI1_TX, GPIO_FUNC_SPI);
+    const uint baud = spi_init(spi1, 100000);
+    printf("SPI initialised with: %d baudrate\n\r", baud);
+
+    // Set interrupt edge trigger
+    gpio_set_irq_enabled(TOUCH_SCREEN_IRQ, GPIO_IRQ_EDGE_FALL, true);
+
+    // De-select the touch controller chip
+    gpio_put(GPIO_SPI1_CSn, true);
+}
+
 int main()
 {
     stdio_init_all();
@@ -184,6 +232,7 @@ int main()
     initialise_lcd_hw();
     initialise_lvgl_framework();
     ui_init(lcd_disp);
+    init_touch_screen();
 
     printf("Hello, world!\n");
     while (true) {
