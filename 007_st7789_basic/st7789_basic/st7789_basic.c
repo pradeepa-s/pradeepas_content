@@ -33,6 +33,12 @@ static uint32_t tick_count = 0;
 
 static lv_display_t *lcd_disp = NULL;
 
+typedef struct {
+    bool valid;
+    uint16_t x;
+    uint16_t y;
+} touch_point_t;
+
 uint32_t get_tick_count()
 {
     return tick_count;
@@ -221,9 +227,62 @@ void init_touch_screen()
     // Set interrupt edge trigger
     gpio_set_irq_enabled(TOUCH_SCREEN_IRQ, GPIO_IRQ_EDGE_FALL, true);
 
+    gpio_put(GPIO_SPI1_CSn, false);
+    const uint8_t dummy = 0x00;
+    const uint8_t idle = 0b10000000;
+    uint8_t buffer[2];
+    spi_write_blocking(spi1, &idle, sizeof(idle));
+    spi_read_blocking(spi1, dummy, buffer, sizeof(buffer));
+
     // De-select the touch controller chip
     gpio_put(GPIO_SPI1_CSn, true);
 }
+
+static uint16_t get_reading(const uint8_t* buffer)
+{
+    // Only the first 12 bits have valid data.
+    // Data is in the buffer MSB first.
+    uint16_t reading = (buffer[0] << 8) | buffer[1];
+    reading = reading >> 4;
+    return reading;
+}
+
+static touch_point_t read_touch_point()
+{
+    // Select chip
+    gpio_put(GPIO_SPI1_CSn, false);
+
+    const uint8_t dummy = 0x00;
+
+    // START(1) + CHANNEL(001) + MODE(0) + DFR(0) + POWER_DOWN(00)
+    // The following reading enables, channel 001.
+    // This energises Y plane (Yp and Yn). Then connects Xp to ADC.
+    // Xp voltage corresponds to Y reading.
+    const uint8_t read_y = 0b10010000;
+
+    // START(1) + CHANNEL(101) + MODE(0) + DFR(0) + POWER_DOWN(00)
+    // The following reading enables, channel 101.
+    // This energises Y plane (Yp and Yn). Then connects Xp to ADC.
+    // Yp voltage corresponds to X reading.
+    const uint8_t read_x = 0b11010000;
+    uint8_t buffer[2];
+
+    spi_write_blocking(spi1, &read_y, sizeof(read_y));
+    spi_read_blocking(spi1, dummy, buffer, sizeof(buffer));
+    uint16_t reading_y = get_reading(buffer);
+
+    spi_write_blocking(spi1, &read_x, sizeof(read_x));
+    spi_read_blocking(spi1, dummy, buffer, sizeof(buffer));
+
+    uint16_t reading_x = get_reading(buffer);
+    printf("(X, Y) -> (%d, %d)\n", reading_x, reading_y);
+
+    touch_point_t tp = {.x = reading_x, .y = reading_y};
+    gpio_put(GPIO_SPI1_CSn, true);
+
+    return tp;
+}
+
 
 int main()
 {
@@ -237,5 +296,12 @@ int main()
     printf("Hello, world!\n");
     while (true) {
         lv_timer_handler();
+        if (touch_detected) {
+            read_touch_point();
+
+            sleep_ms(1000);
+            gpio_set_irq_enabled(TOUCH_SCREEN_IRQ, GPIO_IRQ_EDGE_FALL, true);
+            touch_detected = false;
+        }
     }
 }
