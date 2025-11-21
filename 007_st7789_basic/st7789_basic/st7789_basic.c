@@ -193,8 +193,7 @@ static void ui_init(lv_display_t *disp)
 
 void touch_irq()
 {
-    // Don't enable interrupts until we detect the release. The release is detected by
-    // contnuously reading the touch sensor and evaluating the reading.
+    // We don't enable interrupts until we complete the reading.
     gpio_acknowledge_irq(TOUCH_SCREEN_IRQ, GPIO_IRQ_EDGE_FALL);
     gpio_set_irq_enabled(TOUCH_SCREEN_IRQ, GPIO_IRQ_EDGE_FALL, false);
     touch_detected = true;
